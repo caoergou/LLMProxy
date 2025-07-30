@@ -2,8 +2,17 @@ const CryptoJS = require('crypto-js');
 
 class Encryption {
     constructor() {
-        this.secretKey = process.env.ENCRYPTION_KEY || 'default-secret-key-change-in-production';
-    }
+        if (!process.env.ENCRYPTION_KEY) {
+            if (process.env.NODE_ENV === 'production') {
+                throw new Error('ENCRYPTION_KEY environment variable must be set in production.');
+            } else {
+                console.warn('Warning: ENCRYPTION_KEY is not set. Using an insecure default key for non-production environments.');
+               this.secretKey = 'default-secret-key-change-in-production';
+           }
+       } else {
+           this.secretKey = process.env.ENCRYPTION_KEY;
+       }
+   }
 
     encrypt(text) {
         return CryptoJS.AES.encrypt(text, this.secretKey).toString();
