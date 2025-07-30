@@ -14,10 +14,27 @@
 
 ## 🎯 支持的 AI 服务商
 
-- **OpenAI**: GPT-4, GPT-3.5, ChatGPT
-- **Anthropic**: Claude 3 系列
-- **Azure OpenAI**: Azure 托管的 OpenAI 服务
-- 易于扩展支持更多服务商
+<div align="center">
+
+### 🚀 当前支持的模型
+
+| 提供商 | 图标 | 模型 | 特性 |
+|--------|------|------|------|
+| **OpenAI** | 🤖 | GPT-4, GPT-4 Turbo, GPT-3.5 Turbo | 最先进的语言模型，适合复杂任务 |
+| **Anthropic** | 🧠 | Claude 3 Opus, Sonnet, Haiku | 安全可靠，擅长推理和分析 |
+| **Azure OpenAI** | ☁️ | GPT-4, GPT-4 32K, GPT-3.5 Turbo | 企业级部署，数据安全 |
+
+</div>
+
+### 📈 扩展支持
+
+系统采用配置化设计，支持快速添加新的 AI 服务提供商。查看 [贡献指南](CONTRIBUTING.md) 了解如何添加新的服务商支持。
+
+### 🔄 智能路由
+
+- **自动选择**：根据成本、额度、响应时间智能选择最优 API
+- **格式转换**：自动适配不同厂商的请求/响应格式
+- **负载均衡**：支持多个 API 密钥的负载分配
 
 ## 📦 快速开始
 
@@ -149,6 +166,26 @@ GET http://localhost:3000/api/health
 - `DATABASE_PATH`: 数据库文件路径
 - `LOG_LEVEL`: 日志级别
 
+### 🔧 供应商配置
+
+系统采用配置化设计，所有 AI 服务商的配置都存储在 `configs/providers/` 目录下：
+
+```
+configs/
+└── providers/
+    ├── openai.json      # OpenAI 配置
+    ├── anthropic.json   # Anthropic 配置
+    ├── azure.json       # Azure OpenAI 配置
+    └── ...              # 其他供应商配置
+```
+
+每个配置文件包含：
+- 🔗 API 端点和认证信息
+- 💰 成本和额度设置
+- 🔄 请求/响应格式适配
+- 📋 支持的模型列表
+- 🎨 显示图标和描述
+
 ### API 密钥配置
 
 在 Web 界面中配置 API 密钥时，需要提供:
@@ -274,6 +311,19 @@ pm2 startup
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request 来改进项目！
+
+### 🆕 添加新的 AI 服务商
+
+想要添加对新 AI 服务商的支持？查看我们的 [贡献指南](CONTRIBUTING.md)，其中包含：
+
+- 📝 配置文件格式说明
+- 🔧 格式适配器实现指南
+- 🧪 测试流程
+- 📋 提交 PR 的要求
+
+### 🐛 报告问题
+
+如果发现 bug 或有功能建议，请通过 [GitHub Issues](https://github.com/caoergou/api-proxy/issues) 提交。
 
 ## 📄 许可证
 

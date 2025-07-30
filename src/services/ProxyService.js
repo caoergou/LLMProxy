@@ -1,6 +1,7 @@
 const axios = require('axios');
 const ApiKeyModel = require('../models/ApiKey');
 const ApiCallModel = require('../models/ApiCall');
+const ProviderConfigLoader = require('../utils/ProviderConfigLoader');
 
 class ProxyService {
     constructor() {
@@ -9,6 +10,7 @@ class ProxyService {
             anthropic: this.adaptAnthropicFormat.bind(this),
             azure: this.adaptAzureFormat.bind(this)
         };
+        this.providerConfig = ProviderConfigLoader;
     }
 
     async proxyRequest(provider, endpoint, method, data, headers = {}) {
@@ -108,17 +110,24 @@ class ProxyService {
     buildHeaders(apiKey, additionalHeaders = {}) {
         const headers = { ...additionalHeaders };
         
-        // Add authentication based on provider
-        if (apiKey.provider === 'openai') {
-            headers['Authorization'] = `Bearer ${apiKey.api_key}`;
-            headers['Content-Type'] = 'application/json';
-        } else if (apiKey.provider === 'anthropic') {
-            headers['x-api-key'] = apiKey.api_key;
-            headers['Content-Type'] = 'application/json';
-            headers['anthropic-version'] = '2023-06-01';
-        } else if (apiKey.provider === 'azure') {
-            headers['api-key'] = apiKey.api_key;
-            headers['Content-Type'] = 'application/json';
+        // Use provider config to build headers
+        const providerConfig = this.providerConfig.getProvider(apiKey.provider);
+        if (providerConfig && providerConfig.headers) {
+            const configHeaders = this.providerConfig.buildHeaders(apiKey.provider, apiKey.api_key);
+            Object.assign(headers, configHeaders);
+        } else {
+            // Fallback to hardcoded headers for backward compatibility
+            if (apiKey.provider === 'openai') {
+                headers['Authorization'] = `Bearer ${apiKey.api_key}`;
+                headers['Content-Type'] = 'application/json';
+            } else if (apiKey.provider === 'anthropic') {
+                headers['x-api-key'] = apiKey.api_key;
+                headers['Content-Type'] = 'application/json';
+                headers['anthropic-version'] = '2023-06-01';
+            } else if (apiKey.provider === 'azure') {
+                headers['api-key'] = apiKey.api_key;
+                headers['Content-Type'] = 'application/json';
+            }
         }
 
         return headers;
@@ -197,6 +206,16 @@ class ProxyService {
         } catch (error) {
             console.error('Failed to log API call:', error);
         }
+    }
+
+    // Get list of supported providers from config
+    getSupportedProviders() {
+        return this.providerConfig.getAllProviders();
+    }
+
+    // Check if provider is supported
+    isProviderSupported(providerId) {
+        return this.providerConfig.hasProvider(providerId);
     }
 }
 

@@ -1,0 +1,40 @@
+{
+  "provider": "azure",
+  "name": "Azure OpenAI",
+  "display_name": "Azure OpenAI",
+  "description": "Microsoft Azure hosted OpenAI models with enterprise features",
+  "base_url": "https://your-resource.openai.azure.com",
+  "auth_type": "api-key",
+  "request_format": "openai",
+  "response_format": "openai",
+  "cost_per_request": 0.002,
+  "endpoints": [
+    "/openai/deployments/{deployment-name}/chat/completions",
+    "/openai/deployments/{deployment-name}/completions",
+    "/openai/deployments/{deployment-name}/embeddings"
+  ],
+  "models": [
+    {
+      "name": "gpt-4",
+      "display_name": "GPT-4 (Azure)",
+      "description": "GPT-4 model hosted on Azure"
+    },
+    {
+      "name": "gpt-4-32k",
+      "display_name": "GPT-4 32K (Azure)",
+      "description": "GPT-4 with 32K context window"
+    },
+    {
+      "name": "gpt-35-turbo",
+      "display_name": "GPT-3.5 Turbo (Azure)",
+      "description": "GPT-3.5 Turbo hosted on Azure"
+    }
+  ],
+  "headers": {
+    "api-key": "{{api_key}}",
+    "Content-Type": "application/json"
+  },
+  "icon": "☁️",
+  "website": "https://azure.microsoft.com/en-us/products/ai-services/openai-service",
+  "documentation": "https://learn.microsoft.com/en-us/azure/ai-services/openai/"
+}

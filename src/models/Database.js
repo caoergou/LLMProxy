@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const ProviderConfigLoader = require('../utils/ProviderConfigLoader');
 
 class Database {
     constructor() {
@@ -73,52 +74,31 @@ class Database {
     }
 
     seedProviderTemplates() {
-        const providers = [
-                {
-                    provider: 'openai',
-                    name: 'OpenAI',
-                    base_url: 'https://api.openai.com/v1',
-                    auth_type: 'bearer',
-                    request_format: 'openai',
-                    response_format: 'openai',
-                    cost_per_request: 0.002,
-                    endpoints: JSON.stringify(['/chat/completions', '/completions', '/embeddings'])
-                },
-                {
-                    provider: 'anthropic',
-                    name: 'Anthropic Claude',
-                    base_url: 'https://api.anthropic.com',
-                    auth_type: 'header',
-                    request_format: 'anthropic',
-                    response_format: 'anthropic',
-                    cost_per_request: 0.003,
-                    endpoints: JSON.stringify(['/v1/messages'])
-                },
-                {
-                    provider: 'azure',
-                    name: 'Azure OpenAI',
-                    base_url: 'https://your-resource.openai.azure.com',
-                    auth_type: 'api-key',
-                    request_format: 'openai',
-                    response_format: 'openai',
-                    cost_per_request: 0.002,
-                    endpoints: JSON.stringify(['/openai/deployments/{deployment-name}/chat/completions'])
-                }
-            ];
+        // Load providers from configuration files
+        const providers = ProviderConfigLoader.getAllProviders().map(config => ({
+            provider: config.provider,
+            name: config.name,
+            base_url: config.base_url,
+            auth_type: config.auth_type,
+            request_format: config.request_format,
+            response_format: config.response_format,
+            cost_per_request: config.cost_per_request,
+            endpoints: JSON.stringify(config.endpoints)
+        }));
 
-            providers.forEach(provider => {
-                this.db.run(`INSERT OR IGNORE INTO provider_templates 
-                    (provider, name, base_url, auth_type, request_format, response_format, cost_per_request, endpoints)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                    [provider.provider, provider.name, provider.base_url, provider.auth_type, 
-                     provider.request_format, provider.response_format, provider.cost_per_request, provider.endpoints],
-                    (err) => {
-                        if (err) {
-                            console.error('Error seeding provider template:', err);
-                        }
+        providers.forEach(provider => {
+            this.db.run(`INSERT OR IGNORE INTO provider_templates 
+                (provider, name, base_url, auth_type, request_format, response_format, cost_per_request, endpoints)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+                [provider.provider, provider.name, provider.base_url, provider.auth_type, 
+                 provider.request_format, provider.response_format, provider.cost_per_request, provider.endpoints],
+                (err) => {
+                    if (err) {
+                        console.error('Error seeding provider template:', err);
                     }
-                );
-            });
+                }
+            );
+        });
     }
 
     getDb() {
