@@ -45,6 +45,8 @@ class ProxyService {
             // Update quota if applicable
             if (selectedApiKey.remaining_quota > 0) {
                 await ApiKeyModel.updateQuota(selectedApiKey.id, selectedApiKey.remaining_quota - 1);
+            } else {
+                throw new Error(`Quota exhausted for API key: ${selectedApiKey.name}`);
             }
 
             // Log successful call
