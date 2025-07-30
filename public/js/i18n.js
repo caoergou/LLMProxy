@@ -220,7 +220,7 @@ class I18n {
     }
 
     t(key, params = {}) {
-        let translation = this.translations[this.currentLanguage]?.[key] || this.translations['zh'][key] || key;
+        let translation = this.translations[this.currentLanguage]?.[key] || this.translations[I18n.DEFAULT_LANGUAGE][key] || key;
         
         // Simple parameter replacement
         Object.keys(params).forEach(param => {
