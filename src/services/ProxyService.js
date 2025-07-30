@@ -92,13 +92,17 @@ class ProxyService {
         // 1. Unlimited quota (remaining_quota = -1)
         // 2. Highest remaining quota
         // 3. Lowest cost per request
-        return apiKeys.find(key => key.remaining_quota === -1) || 
-               apiKeys.sort((a, b) => {
-                   if (a.remaining_quota !== b.remaining_quota) {
-                       return b.remaining_quota - a.remaining_quota;
-                   }
-                   return a.cost_per_request - b.cost_per_request;
-               })[0];
+        const unlimitedQuotaKeys = apiKeys.filter(key => key.remaining_quota === -1);
+        if (unlimitedQuotaKeys.length > 0) {
+            return unlimitedQuotaKeys.sort((a, b) => a.cost_per_request - b.cost_per_request)[0];
+        }
+
+        return apiKeys.sort((a, b) => {
+            if (a.remaining_quota !== b.remaining_quota) {
+               return b.remaining_quota - a.remaining_quota;
+           }
+           return a.cost_per_request - b.cost_per_request;
+       })[0];
     }
 
     buildHeaders(apiKey, additionalHeaders = {}) {
