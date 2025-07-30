@@ -40,7 +40,9 @@ class ApiKeyModel {
     static getActiveByProvider(provider) {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
-            db.all(`SELECT * FROM api_keys WHERE provider = ? AND is_active = 1 
+            db.all(`SELECT id, provider, name, cost_per_request, remaining_quota, 
+                    is_active, created_at, updated_at 
+                    FROM api_keys WHERE provider = ? AND is_active = 1 
                     ORDER BY 
                         CASE WHEN remaining_quota = -1 THEN 1 ELSE 0 END DESC,
                         remaining_quota DESC,
