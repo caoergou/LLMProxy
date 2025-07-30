@@ -73,9 +73,7 @@ class Database {
     }
 
     seedProviderTemplates() {
-        // Add a small delay to ensure tables are created first
-        setTimeout(() => {
-            const providers = [
+        const providers = [
                 {
                     provider: 'openai',
                     name: 'OpenAI',
