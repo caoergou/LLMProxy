@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
-<!-- Note: The lang attribute is set to 'en' as a default. Consider implementing internationalization (i18n) for broader audience support. -->
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Proxy 管理面板</title>
+    <title data-i18n="app.title">API Proxy 管理面板</title>
     <style>
         * {
             margin: 0;
@@ -265,92 +264,125 @@
             gap: 8px;
         }
 
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+        }
+
+        .language-selector select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: #2563eb;
         }
     </style>
 </head>
 <body>
+    <!-- Language Selector -->
+    <div class="language-selector">
+        <select id="languageSelect" onchange="changeLanguage(this.value)">
+            <option value="zh" data-i18n="lang.chinese">中文</option>
+            <option value="en" data-i18n="lang.english">English</option>
+        </select>
+    </div>
+
     <div class="container">
         <div class="header">
-            <h1>API Proxy 管理面板</h1>
-            <p>统一接口管理，集中加密管理多平台 API 密钥，智能选择最优 API</p>
+            <h1 data-i18n="app.title">API Proxy 管理面板</h1>
+            <p data-i18n="app.description">统一接口管理，集中加密管理多平台 API 密钥，智能选择最优 API</p>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('dashboard')">仪表板</button>
-            <button class="tab" onclick="switchTab('keys')">API 密钥</button>
-            <button class="tab" onclick="switchTab('logs')">调用日志</button>
-            <button class="tab" onclick="switchTab('settings')">设置</button>
+            <button class="tab active" onclick="switchTab('dashboard')" data-i18n="nav.dashboard">仪表板</button>
+            <button class="tab" onclick="switchTab('keys')" data-i18n="nav.keys">API 密钥</button>
+            <button class="tab" onclick="switchTab('logs')" data-i18n="nav.logs">调用日志</button>
+            <button class="tab" onclick="switchTab('settings')" data-i18n="nav.settings">设置</button>
         </div>
 
         <!-- Dashboard Tab -->
         <div id="dashboard" class="tab-content active">
             <div class="stats-grid" id="statsGrid">
-                <div class="loading">加载统计数据中...</div>
+                <div class="loading" data-i18n="dashboard.loading_stats">加载统计数据中...</div>
             </div>
             
-            <h3 style="margin-bottom: 15px;">最近调用</h3>
+            <h3 style="margin-bottom: 15px;" data-i18n="dashboard.recent_calls">最近调用</h3>
             <div id="recentCalls">
-                <div class="loading">加载最近调用记录中...</div>
+                <div class="loading" data-i18n="dashboard.loading_calls">加载最近调用记录中...</div>
             </div>
         </div>
 
         <!-- API Keys Tab -->
         <div id="keys" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>API 密钥管理</h3>
-                <button class="btn" onclick="showAddKeyModal()">添加密钥</button>
+                <h3 data-i18n="keys.title">API 密钥管理</h3>
+                <button class="btn" onclick="showAddKeyModal()" data-i18n="keys.add">添加密钥</button>
             </div>
             
             <div id="apiKeysTable">
-                <div class="loading">加载 API 密钥中...</div>
+                <div class="loading" data-i18n="keys.loading">加载 API 密钥中...</div>
             </div>
         </div>
 
         <!-- Logs Tab -->
         <div id="logs" class="tab-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3>调用日志</h3>
+                <h3 data-i18n="logs.title">调用日志</h3>
                 <select id="timeRange" onchange="loadStats(); loadRecentCalls();">
-                    <option value="1h">最近 1 小时</option>
-                    <option value="24h" selected>最近 24 小时</option>
-                    <option value="7d">最近 7 天</option>
-                    <option value="30d">最近 30 天</option>
+                    <option value="1h" data-i18n="logs.time_range.1h">最近 1 小时</option>
+                    <option value="24h" selected data-i18n="logs.time_range.24h">最近 24 小时</option>
+                    <option value="7d" data-i18n="logs.time_range.7d">最近 7 天</option>
+                    <option value="30d" data-i18n="logs.time_range.30d">最近 30 天</option>
                 </select>
             </div>
             
             <div id="callsTable">
-                <div class="loading">加载调用日志中...</div>
+                <div class="loading" data-i18n="logs.loading">加载调用日志中...</div>
             </div>
         </div>
 
         <!-- Settings Tab -->
         <div id="settings" class="tab-content">
-            <h3 style="margin-bottom: 20px;">系统设置</h3>
+            <h3 style="margin-bottom: 20px;" data-i18n="settings.title">系统设置</h3>
             
             <div class="form-group">
-                <label>服务端口</label>
+                <label data-i18n="settings.language">语言</label>
+                <select id="settingsLanguageSelect" onchange="changeLanguage(this.value)">
+                    <option value="zh" data-i18n="lang.chinese">中文</option>
+                    <option value="en" data-i18n="lang.english">English</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label data-i18n="settings.server_port">服务端口</label>
                 <input type="number" id="serverPort" value="3000" readonly>
-                <small style="color: #6b7280;">重启服务生效</small>
+                <small style="color: #6b7280;" data-i18n="settings.server_port_note">重启服务生效</small>
             </div>
             
             <div class="form-group">
-                <label>加密密钥</label>
-                <input type="password" id="encryptionKey" placeholder="用于加密存储的密钥">
-                <small style="color: #6b7280;">修改后需要重新配置所有 API 密钥</small>
+                <label data-i18n="settings.encryption_key">加密密钥</label>
+                <input type="password" id="encryptionKey" data-i18n-placeholder="settings.encryption_key_placeholder" placeholder="用于加密存储的密钥">
+                <small style="color: #6b7280;" data-i18n="settings.encryption_key_note">修改后需要重新配置所有 API 密钥</small>
             </div>
             
             <div class="form-group">
-                <h4 style="margin-bottom: 10px;">使用说明</h4>
+                <h4 style="margin-bottom: 10px;" data-i18n="settings.usage_title">使用说明</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; line-height: 1.6;">
-                    <p><strong>统一接口调用：</strong></p>
+                    <p><strong data-i18n="settings.unified_api">统一接口调用：</strong></p>
                     <p>POST <code>http://localhost:3000/api/chat/completions?provider=openai</code></p>
-                    <p>支持的 provider: openai, anthropic, azure</p>
+                    <p data-i18n="settings.unified_api_note">支持的 provider: openai, anthropic, azure</p>
                     <br>
-                    <p><strong>直接代理调用：</strong></p>
+                    <p><strong data-i18n="settings.proxy_api">直接代理调用：</strong></p>
                     <p>POST <code>http://localhost:3000/api/proxy/openai/chat/completions</code></p>
-                    <p>自动选择最优 API 密钥，支持格式转换</p>
+                    <p data-i18n="settings.proxy_api_note">自动选择最优 API 密钥，支持格式转换</p>
                 </div>
             </div>
         </div>
@@ -360,7 +392,7 @@
     <div id="keyModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle">添加 API 密钥</h3>
+                <h3 id="modalTitle" data-i18n="modal.add_key">添加 API 密钥</h3>
                 <button class="close" onclick="closeKeyModal()">&times;</button>
             </div>
             
@@ -368,9 +400,9 @@
                 <input type="hidden" id="keyId">
                 
                 <div class="form-group">
-                    <label>提供商</label>
+                    <label data-i18n="modal.provider">提供商</label>
                     <select id="provider" onchange="updateProviderFields()" required>
-                        <option value="">选择提供商</option>
+                        <option value="" data-i18n="modal.select_provider">选择提供商</option>
                         <option value="openai">OpenAI</option>
                         <option value="anthropic">Anthropic Claude</option>
                         <option value="azure">Azure OpenAI</option>
@@ -378,62 +410,86 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>名称</label>
-                    <input type="text" id="keyName" required placeholder="为此密钥命名">
+                    <label data-i18n="modal.key_name">名称</label>
+                    <input type="text" id="keyName" required data-i18n-placeholder="modal.key_name_placeholder" placeholder="为此密钥命名">
                 </div>
                 
                 <div class="form-group">
-                    <label>API 密钥</label>
-                    <input type="password" id="apiKey" required placeholder="输入 API 密钥">
+                    <label data-i18n="modal.api_key">API 密钥</label>
+                    <input type="password" id="apiKey" required data-i18n-placeholder="modal.api_key_placeholder" placeholder="输入 API 密钥">
                 </div>
                 
                 <div class="form-group" id="apiSecretGroup" style="display: none;">
-                    <label>API Secret</label>
-                    <input type="password" id="apiSecret" placeholder="输入 API Secret（如需要）">
+                    <label data-i18n="modal.api_secret">API Secret</label>
+                    <input type="password" id="apiSecret" data-i18n-placeholder="modal.api_secret_placeholder" placeholder="输入 API Secret（如需要）">
                 </div>
                 
                 <div class="form-group">
-                    <label>基础 URL</label>
-                    <input type="url" id="baseUrl" required placeholder="API 基础地址">
+                    <label data-i18n="modal.base_url">基础 URL</label>
+                    <input type="url" id="baseUrl" required data-i18n-placeholder="modal.base_url_placeholder" placeholder="API 基础地址">
                 </div>
                 
                 <div class="form-group">
-                    <label>每次调用成本</label>
+                    <label data-i18n="modal.cost_per_request">每次调用成本</label>
                     <input type="number" id="costPerRequest" step="0.0001" value="0" placeholder="0.002">
                 </div>
                 
                 <div class="form-group">
-                    <label>剩余额度</label>
-                    <input type="number" id="remainingQuota" value="-1" placeholder="-1 表示无限制">
+                    <label data-i18n="modal.remaining_quota">剩余额度</label>
+                    <input type="number" id="remainingQuota" value="-1" data-i18n-placeholder="modal.remaining_quota_placeholder" placeholder="-1 表示无限制">
                 </div>
                 
                 <div class="form-group">
-                    <label>总额度</label>
-                    <input type="number" id="totalQuota" value="-1" placeholder="-1 表示无限制">
+                    <label data-i18n="modal.total_quota">总额度</label>
+                    <input type="number" id="totalQuota" value="-1" data-i18n-placeholder="modal.total_quota_placeholder" placeholder="-1 表示无限制">
                 </div>
                 
                 <div class="form-group">
                     <div class="checkbox-group">
                         <input type="checkbox" id="isActive" checked>
-                        <label for="isActive">启用此密钥</label>
+                        <label for="isActive" data-i18n="modal.enable_key">启用此密钥</label>
                     </div>
                 </div>
                 
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeKeyModal()">取消</button>
-                    <button type="submit" class="btn">保存</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeKeyModal()" data-i18n="modal.cancel">取消</button>
+                    <button type="submit" class="btn" data-i18n="modal.save">保存</button>
                 </div>
             </form>
         </div>
     </div>
 
+    <script src="js/i18n.js"></script>
     <script>
         // Global state
         let apiKeys = [];
         let currentEditingKey = null;
 
+        // Language change function
+        function changeLanguage(lang) {
+            i18n.setLanguage(lang);
+            
+            // Update language selectors
+            document.getElementById('languageSelect').value = lang;
+            document.getElementById('settingsLanguageSelect').value = lang;
+            
+            // Reload dynamic content with new language
+            loadStats();
+            loadApiKeys();
+            loadRecentCalls();
+        }
+
         // Initialize page
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize i18n
+            const currentLang = i18n.getCurrentLanguage();
+            document.getElementById('languageSelect').value = currentLang;
+            document.getElementById('settingsLanguageSelect').value = currentLang;
+            document.documentElement.lang = currentLang;
+            
+            // Apply initial translations
+            i18n.updateDOM();
+            
             loadStats();
             loadApiKeys();
             loadRecentCalls();
@@ -481,10 +537,10 @@
                 if (result.success) {
                     displayStats(result.data);
                 } else {
-                    showAlert('加载统计数据失败: ' + result.error, 'error');
+                    showAlert(i18n.t('msg.loading_stats_failed') + ': ' + result.error, 'error');
                 }
             } catch (error) {
-                showAlert('加载统计数据失败: ' + error.message, 'error');
+                showAlert(i18n.t('msg.loading_stats_failed') + ': ' + error.message, 'error');
             }
         }
 
@@ -492,7 +548,7 @@
             const statsGrid = document.getElementById('statsGrid');
             
             if (stats.length === 0) {
-                statsGrid.innerHTML = '<div class="loading">暂无统计数据</div>';
+                statsGrid.innerHTML = `<div class="loading">${i18n.t('dashboard.no_data')}</div>`;
                 return;
             }
             
@@ -503,19 +559,19 @@
             
             statsGrid.innerHTML = `
                 <div class="stat-card">
-                    <h3>总调用次数</h3>
+                    <h3>${i18n.t('stats.total_calls')}</h3>
                     <div class="stat-value">${totalCalls.toLocaleString()}</div>
                 </div>
                 <div class="stat-card">
-                    <h3>总成本</h3>
+                    <h3>${i18n.t('stats.total_cost')}</h3>
                     <div class="stat-value">$${totalCost.toFixed(4)}</div>
                 </div>
                 <div class="stat-card">
-                    <h3>平均响应时间</h3>
+                    <h3>${i18n.t('stats.avg_response_time')}</h3>
                     <div class="stat-value">${Math.round(avgResponseTime)}ms</div>
                 </div>
                 <div class="stat-card">
-                    <h3>成功率</h3>
+                    <h3>${i18n.t('stats.success_rate')}</h3>
                     <div class="stat-value">${successRate.toFixed(1)}%</div>
                 </div>
             `;
@@ -531,10 +587,10 @@
                     apiKeys = result.data;
                     displayApiKeys(result.data);
                 } else {
-                    showAlert('加载 API 密钥失败: ' + result.error, 'error');
+                    showAlert(i18n.t('msg.loading_keys_failed') + ': ' + result.error, 'error');
                 }
             } catch (error) {
-                showAlert('加载 API 密钥失败: ' + error.message, 'error');
+                showAlert(i18n.t('msg.loading_keys_failed') + ': ' + error.message, 'error');
             }
         }
 
@@ -542,7 +598,7 @@
             const container = document.getElementById('apiKeysTable');
             
             if (keys.length === 0) {
-                container.innerHTML = '<div class="loading">暂无 API 密钥</div>';
+                container.innerHTML = `<div class="loading">${i18n.t('keys.no_keys')}</div>`;
                 return;
             }
             
@@ -550,12 +606,12 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>名称</th>
-                            <th>提供商</th>
-                            <th>成本/次</th>
-                            <th>剩余额度</th>
-                            <th>状态</th>
-                            <th>操作</th>
+                            <th>${i18n.t('keys.name')}</th>
+                            <th>${i18n.t('keys.provider')}</th>
+                            <th>${i18n.t('keys.cost_per_request')}</th>
+                            <th>${i18n.t('keys.remaining_quota')}</th>
+                            <th>${i18n.t('keys.status')}</th>
+                            <th>${i18n.t('keys.actions')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -564,15 +620,15 @@
                                 <td>${key.name}</td>
                                 <td>${key.provider}</td>
                                 <td>$${key.cost_per_request}</td>
-                                <td>${key.remaining_quota === -1 ? '无限制' : key.remaining_quota.toLocaleString()}</td>
+                                <td>${key.remaining_quota === -1 ? i18n.t('keys.unlimited') : key.remaining_quota.toLocaleString()}</td>
                                 <td>
                                     <span class="${key.is_active ? 'status-active' : 'status-inactive'}">
-                                        ${key.is_active ? '启用' : '禁用'}
+                                        ${key.is_active ? i18n.t('keys.active') : i18n.t('keys.inactive')}
                                     </span>
                                 </td>
                                 <td>
-                                    <button class="btn btn-secondary" style="margin-right: 5px;" onclick="editKey(${key.id})">编辑</button>
-                                    <button class="btn btn-danger" onclick="deleteKey(${key.id})">删除</button>
+                                    <button class="btn btn-secondary" style="margin-right: 5px;" onclick="editKey(${key.id})">${i18n.t('keys.edit')}</button>
+                                    <button class="btn btn-danger" onclick="deleteKey(${key.id})">${i18n.t('keys.delete')}</button>
                                 </td>
                             </tr>
                         `).join('')}
@@ -592,10 +648,10 @@
                 if (result.success) {
                     displayRecentCalls(result.data);
                 } else {
-                    showAlert('加载调用日志失败: ' + result.error, 'error');
+                    showAlert(i18n.t('msg.loading_calls_failed') + ': ' + result.error, 'error');
                 }
             } catch (error) {
-                showAlert('加载调用日志失败: ' + error.message, 'error');
+                showAlert(i18n.t('msg.loading_calls_failed') + ': ' + error.message, 'error');
             }
         }
 
@@ -604,7 +660,7 @@
             
             if (calls.length === 0) {
                 containers.forEach(container => {
-                    if (container) container.innerHTML = '<div class="loading">暂无调用记录</div>';
+                    if (container) container.innerHTML = `<div class="loading">${i18n.t('dashboard.no_calls')}</div>`;
                 });
                 return;
             }
@@ -613,13 +669,13 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>时间</th>
-                            <th>提供商</th>
-                            <th>API 名称</th>
-                            <th>端点</th>
-                            <th>状态</th>
-                            <th>响应时间</th>
-                            <th>成本</th>
+                            <th>${i18n.t('logs.time')}</th>
+                            <th>${i18n.t('logs.provider')}</th>
+                            <th>${i18n.t('logs.api_name')}</th>
+                            <th>${i18n.t('logs.endpoint')}</th>
+                            <th>${i18n.t('logs.status')}</th>
+                            <th>${i18n.t('logs.response_time')}</th>
+                            <th>${i18n.t('logs.cost')}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -649,7 +705,7 @@
 
         // Modal functions
         function showAddKeyModal() {
-            document.getElementById('modalTitle').textContent = '添加 API 密钥';
+            document.getElementById('modalTitle').textContent = i18n.t('modal.add_key');
             document.getElementById('keyForm').reset();
             document.getElementById('keyId').value = '';
             currentEditingKey = null;
@@ -660,7 +716,7 @@
             const key = apiKeys.find(k => k.id === id);
             if (!key) return;
             
-            document.getElementById('modalTitle').textContent = '编辑 API 密钥';
+            document.getElementById('modalTitle').textContent = i18n.t('modal.edit_key');
             document.getElementById('keyId').value = key.id;
             document.getElementById('provider').value = key.provider;
             document.getElementById('keyName').value = key.name;
@@ -733,20 +789,20 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showAlert(keyId ? 'API 密钥更新成功' : 'API 密钥添加成功', 'success');
+                    showAlert(keyId ? i18n.t('msg.key_updated') : i18n.t('msg.key_added'), 'success');
                     closeKeyModal();
                     loadApiKeys();
                 } else {
-                    showAlert('操作失败: ' + result.error, 'error');
+                    showAlert(i18n.t('msg.operation_failed') + ': ' + result.error, 'error');
                 }
             } catch (error) {
-                showAlert('操作失败: ' + error.message, 'error');
+                showAlert(i18n.t('msg.operation_failed') + ': ' + error.message, 'error');
             }
         }
 
         // Delete key
         async function deleteKey(id) {
-            if (!confirm('确定要删除这个 API 密钥吗？')) {
+            if (!confirm(i18n.t('msg.delete_confirm'))) {
                 return;
             }
             
@@ -758,13 +814,13 @@
                 const result = await response.json();
                 
                 if (result.success) {
-                    showAlert('API 密钥删除成功', 'success');
+                    showAlert(i18n.t('msg.key_deleted'), 'success');
                     loadApiKeys();
                 } else {
-                    showAlert('删除失败: ' + result.error, 'error');
+                    showAlert(i18n.t('msg.operation_failed') + ': ' + result.error, 'error');
                 }
             } catch (error) {
-                showAlert('删除失败: ' + error.message, 'error');
+                showAlert(i18n.t('msg.operation_failed') + ': ' + error.message, 'error');
             }
         }
 

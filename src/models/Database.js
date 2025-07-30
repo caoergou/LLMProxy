@@ -73,7 +73,8 @@ class Database {
     }
 
     seedProviderTemplates() {
-        const providers = [
+        setTimeout(() => {
+            const providers = [
                 {
                     provider: 'openai',
                     name: 'OpenAI',
