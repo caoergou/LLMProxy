@@ -21,26 +21,59 @@
 
 ## 📦 快速开始
 
-### 1. 安装依赖
+### 🐳 Docker 一键部署（推荐）
+
+使用 Docker 是最简单的部署方式，无需安装 Node.js 和其他依赖：
+
+```bash
+# 克隆项目
+git clone https://github.com/caoergou/api-proxy.git
+cd api-proxy
+
+# 一键启动
+./start.sh
+
+# 一键停止
+./stop.sh
+```
+
+或者使用 docker compose：
+
+```bash
+# 启动服务
+docker compose up -d --build
+
+# 停止服务
+docker compose down
+
+# 查看日志
+docker compose logs -f
+```
+
+### 🔧 传统部署方式
+
+如果您不使用 Docker，可以按以下步骤手动部署：
+
+#### 1. 安装依赖
 
 ```bash
 npm install
 ```
 
-### 2. 配置环境变量
+#### 2. 配置环境变量
 
 ```bash
 cp .env.example .env
 # 编辑 .env 文件，设置加密密钥等配置
 ```
 
-### 3. 启动服务
+#### 3. 启动服务
 
 ```bash
 npm start
 ```
 
-### 4. 访问管理界面
+#### 4. 访问管理界面
 
 打开浏览器访问: http://localhost:3000
 
@@ -158,7 +191,59 @@ GET http://localhost:3000/api/health
 
 ## 🚀 部署建议
 
-### 生产环境部署
+### 🐳 Docker 生产环境部署
+
+Docker 部署是推荐的生产环境部署方式：
+
+#### 基础配置
+
+1. **环境变量配置**:
+   ```bash
+   # 复制并编辑环境变量文件
+   cp .env.example .env
+   # 修改 ENCRYPTION_KEY 为强加密密钥
+   # 设置其他必要的环境变量
+   ```
+
+2. **数据持久化**:
+   - 数据库文件自动保存在 `./data` 目录
+   - Docker 重启后数据不会丢失
+   - 定期备份 `./data` 目录
+
+3. **端口配置**:
+   ```yaml
+   # 在 docker-compose.yml 中修改端口映射
+   ports:
+     - "8080:3000"  # 将服务映射到 8080 端口
+   ```
+
+4. **SSL/TLS 配置**:
+   - 建议使用 Nginx 或 Traefik 作为反向代理
+   - 配置 HTTPS 证书
+
+#### 扩展配置
+
+如需自定义 Docker 配置，可以修改 `docker-compose.yml`：
+
+```yaml
+version: '3.8'
+services:
+  api-proxy:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./.env:/app/.env:ro
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    restart: unless-stopped
+```
+
+### 🔧 传统生产环境部署
+
+如果不使用 Docker，传统部署方式：
 
 1. **修改加密密钥**: 在 `.env` 中设置强加密密钥
 2. **数据备份**: 定期备份 `data/` 目录
