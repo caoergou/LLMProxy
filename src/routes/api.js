@@ -59,7 +59,7 @@ router.get('/providers', async (req, res) => {
 });
 
 // Proxy requests - handle with middleware approach
-router.use('/proxy/:provider', async (req, res) => {
+router.all('/proxy/:provider', async (req, res) => {
     try {
         const provider = req.params.provider;
         const endpoint = req.url;
