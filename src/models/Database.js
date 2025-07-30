@@ -119,7 +119,6 @@ class Database {
                     }
                 );
             });
-        }, 100);
     }
 
     getDb() {
