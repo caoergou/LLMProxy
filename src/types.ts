@@ -34,6 +34,45 @@ export interface ApiCallData {
   created_at?: string;
 }
 
+export interface ModelCapabilities {
+  reasoning: boolean;
+  function_calling: boolean;
+  vision: boolean;
+  code_generation: boolean;
+  multimodal: boolean;
+  streaming: boolean;
+  context_length: number;
+}
+
+export interface ModelPricing {
+  input_price: number;
+  output_price: number;
+  currency: string;
+  billing_unit: string;
+}
+
+export interface ModelPerformance {
+  avg_response_time: number;
+  availability: number;
+}
+
+export interface ModelLimits {
+  max_tokens: number;
+  rpm_limit: number;
+  tpm_limit: number;
+}
+
+export interface ExtendedModelInfo {
+  name: string;
+  display_name: string;
+  model_family: string;
+  description: string;
+  capabilities: ModelCapabilities;
+  pricing: ModelPricing;
+  performance: ModelPerformance;
+  limits: ModelLimits;
+}
+
 export interface ProviderConfig {
   provider: string;
   name: string;
@@ -46,7 +85,7 @@ export interface ProviderConfig {
   cost_per_request?: number;
   endpoints?: any;
   headers?: Record<string, string>;
-  models?: any[];
+  models?: ExtendedModelInfo[];
   icon?: string;
   real_icon_url?: string;
   website?: string;
@@ -132,4 +171,33 @@ export interface RealTimeMetrics {
   total_tokens_last_hour: number;
   error_rate_last_hour: number;
   cost_last_hour: number;
+}
+
+export interface ModelFamilyInfo {
+  family: string;
+  display_name: string;
+  description: string;
+  capabilities: ModelCapabilities;
+  providers: ModelProviderInfo[];
+}
+
+export interface ModelProviderInfo {
+  provider: string;
+  provider_name: string;
+  model_name: string;
+  display_name: string;
+  pricing: ModelPricing;
+  performance: ModelPerformance;
+  limits: ModelLimits;
+  icon?: string;
+}
+
+export interface ModelViewResponse {
+  success: boolean;
+  data: ModelFamilyInfo[];
+}
+
+export interface ModelFamilyDetailResponse {
+  success: boolean;
+  data: ModelFamilyInfo;
 }

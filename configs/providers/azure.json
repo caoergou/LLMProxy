@@ -17,17 +17,92 @@
     {
       "name": "gpt-4",
       "display_name": "GPT-4 (Azure)",
-      "description": "GPT-4 model hosted on Azure"
+      "model_family": "gpt-4",
+      "description": "Azure托管的GPT-4模型，企业级安全",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": false,
+        "code_generation": true,
+        "multimodal": false,
+        "streaming": true,
+        "context_length": 8192
+      },
+      "pricing": {
+        "input_price": 0.03,
+        "output_price": 0.06,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 2.8,
+        "availability": 99.95
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 3000,
+        "tpm_limit": 40000
+      }
     },
     {
       "name": "gpt-4-32k",
       "display_name": "GPT-4 32K (Azure)",
-      "description": "GPT-4 with 32K context window"
+      "model_family": "gpt-4",
+      "description": "Azure托管的GPT-4 32K上下文模型",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": false,
+        "code_generation": true,
+        "multimodal": false,
+        "streaming": true,
+        "context_length": 32768
+      },
+      "pricing": {
+        "input_price": 0.06,
+        "output_price": 0.12,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 3.5,
+        "availability": 99.9
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 1500,
+        "tpm_limit": 20000
+      }
     },
     {
       "name": "gpt-35-turbo",
       "display_name": "GPT-3.5 Turbo (Azure)",
-      "description": "GPT-3.5 Turbo hosted on Azure"
+      "model_family": "gpt-3.5",
+      "description": "Azure托管的GPT-3.5 Turbo模型",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": false,
+        "code_generation": true,
+        "multimodal": false,
+        "streaming": true,
+        "context_length": 16385
+      },
+      "pricing": {
+        "input_price": 0.001,
+        "output_price": 0.002,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 1.5,
+        "availability": 99.95
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 8000,
+        "tpm_limit": 160000
+      }
     }
   ],
   "headers": {

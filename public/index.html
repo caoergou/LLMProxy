@@ -469,6 +469,169 @@
         .markdown-content strong {
             font-weight: 600;
         }
+
+        /* Models Tab Styles */
+        .model-family-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-left: 4px solid #2563eb;
+        }
+
+        .model-family-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .model-family-title h4 {
+            margin: 0 0 5px 0;
+            color: #2563eb;
+            font-size: 20px;
+        }
+
+        .model-family-title p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .model-capabilities {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .capability-badge {
+            background: #e0e7ff;
+            color: #3730a3;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .capability-badge.active {
+            background: #2563eb;
+            color: white;
+        }
+
+        .model-providers {
+            margin-top: 15px;
+        }
+
+        .model-providers h5 {
+            margin: 0 0 10px 0;
+            color: #374151;
+            font-size: 16px;
+        }
+
+        .provider-comparison {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .provider-option {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .provider-option:hover {
+            background: #f3f4f6;
+            border-color: #2563eb;
+        }
+
+        .provider-option.recommended {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .provider-option.recommended::before {
+            content: "⭐ 推荐";
+            color: #10b981;
+            font-weight: 600;
+            font-size: 12px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .provider-option-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .provider-option-icon {
+            font-size: 20px;
+        }
+
+        .provider-option-name {
+            font-weight: 600;
+            color: #2563eb;
+        }
+
+        .provider-option-model {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .provider-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        .provider-metric {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .provider-metric-label {
+            color: #6b7280;
+        }
+
+        .provider-metric-value {
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .model-detail-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .model-detail-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -488,6 +651,7 @@
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('dashboard')" data-i18n="nav.dashboard">仪表板</button>
+            <button class="tab" onclick="switchTab('models')" data-i18n="nav.models">模型浏览</button>
             <button class="tab" onclick="switchTab('providers')" data-i18n="nav.providers">模型供应商</button>
             <button class="tab" onclick="switchTab('keys')" data-i18n="nav.keys">API 密钥</button>
             <button class="tab" onclick="switchTab('logs')" data-i18n="nav.logs">调用日志</button>
@@ -526,6 +690,55 @@
             <h3 style="margin-bottom: 15px;" data-i18n="dashboard.recent_calls">最近调用</h3>
             <div id="recentCalls">
                 <div class="loading" data-i18n="dashboard.loading_calls">加载最近调用记录中...</div>
+            </div>
+        </div>
+
+        <!-- Models Tab -->
+        <div id="models" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 data-i18n="models.title">模型浏览</h3>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <input type="text" id="modelSearch" placeholder="搜索模型..." style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px;">
+                    <button class="btn btn-secondary" onclick="refreshModels()" data-i18n="models.refresh">刷新</button>
+                </div>
+            </div>
+            
+            <!-- Filter Section -->
+            <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;" data-i18n="models.filters">筛选条件</h4>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="filter_reasoning" onchange="applyModelFilters()">
+                        <span data-i18n="models.capabilities.reasoning">推理能力</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="filter_function_calling" onchange="applyModelFilters()">
+                        <span data-i18n="models.capabilities.function_calling">函数调用</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="filter_vision" onchange="applyModelFilters()">
+                        <span data-i18n="models.capabilities.vision">视觉理解</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="filter_code_generation" onchange="applyModelFilters()">
+                        <span data-i18n="models.capabilities.code_generation">代码生成</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="filter_multimodal" onchange="applyModelFilters()">
+                        <span data-i18n="models.capabilities.multimodal">多模态</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="filter_streaming" onchange="applyModelFilters()">
+                        <span data-i18n="models.capabilities.streaming">流式输出</span>
+                    </label>
+                </div>
+                <div style="margin-top: 10px;">
+                    <button class="btn btn-secondary" onclick="clearModelFilters()" style="font-size: 12px; padding: 6px 12px;" data-i18n="models.clear_filters">清除筛选</button>
+                </div>
+            </div>
+            
+            <div id="modelsContainer">
+                <div class="loading" data-i18n="models.loading">加载模型信息中...</div>
             </div>
         </div>
 
@@ -936,6 +1149,8 @@
                 loadRecentCalls();
             } else if (tabName === 'providers') {
                 loadProviders();
+            } else if (tabName === 'models') {
+                loadModels();
             }
         }
 
@@ -1415,6 +1630,175 @@
                 // Code (simple implementation)
                 .replace(/`([^`]+)`/g, '<code>$1</code>');
         }
+
+        // ========================================
+        // Models Tab Functions
+        // ========================================
+
+        let modelFamilies = [];
+        let filteredModels = [];
+
+        // Load models from API
+        async function loadModels() {
+            try {
+                const response = await fetch('/api/models-view');
+                const result = await response.json();
+                
+                if (result.success) {
+                    modelFamilies = result.data;
+                    filteredModels = [...modelFamilies];
+                    displayModels(filteredModels);
+                } else {
+                    showAlert('加载模型失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('加载模型失败: ' + error.message, 'error');
+            }
+        }
+
+        // Display models
+        function displayModels(models) {
+            const container = document.getElementById('modelsContainer');
+            
+            if (models.length === 0) {
+                container.innerHTML = '<div class="loading">没有找到匹配的模型</div>';
+                return;
+            }
+            
+            const modelsHtml = models.map(family => `
+                <div class="model-family-card">
+                    <div class="model-family-header">
+                        <div class="model-family-title">
+                            <h4>${family.display_name}</h4>
+                            <p>${family.description}</p>
+                        </div>
+                        <div class="model-capabilities">
+                            ${generateCapabilityBadges(family.capabilities)}
+                        </div>
+                    </div>
+                    
+                    <div class="model-providers">
+                        <h5>可用供应商 (${family.providers.length})</h5>
+                        <div class="provider-comparison">
+                            ${family.providers.map((provider, index) => `
+                                <div class="provider-option ${index === 0 ? 'recommended' : ''}" onclick="showProviderDetails('${family.family}', '${provider.provider}')">
+                                    <div class="provider-option-header">
+                                        <span class="provider-option-icon">${provider.icon || '🤖'}</span>
+                                        <div>
+                                            <div class="provider-option-name">${provider.provider_name}</div>
+                                            <div class="provider-option-model">${provider.display_name}</div>
+                                        </div>
+                                    </div>
+                                    <div class="provider-metrics">
+                                        <div class="provider-metric">
+                                            <span class="provider-metric-label">输入价格:</span>
+                                            <span class="provider-metric-value">$${provider.pricing.input_price}/1K</span>
+                                        </div>
+                                        <div class="provider-metric">
+                                            <span class="provider-metric-label">输出价格:</span>
+                                            <span class="provider-metric-value">$${provider.pricing.output_price}/1K</span>
+                                        </div>
+                                        <div class="provider-metric">
+                                            <span class="provider-metric-label">响应时间:</span>
+                                            <span class="provider-metric-value">${provider.performance.avg_response_time}s</span>
+                                        </div>
+                                        <div class="provider-metric">
+                                            <span class="provider-metric-label">可用性:</span>
+                                            <span class="provider-metric-value">${provider.performance.availability}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = modelsHtml;
+        }
+
+        // Generate capability badges
+        function generateCapabilityBadges(capabilities) {
+            const badges = [];
+            if (capabilities.reasoning) badges.push('<span class="capability-badge active">推理</span>');
+            if (capabilities.function_calling) badges.push('<span class="capability-badge active">函数调用</span>');
+            if (capabilities.vision) badges.push('<span class="capability-badge active">视觉</span>');
+            if (capabilities.code_generation) badges.push('<span class="capability-badge active">代码生成</span>');
+            if (capabilities.multimodal) badges.push('<span class="capability-badge active">多模态</span>');
+            if (capabilities.streaming) badges.push('<span class="capability-badge active">流式</span>');
+            badges.push(`<span class="capability-badge">上下文: ${capabilities.context_length.toLocaleString()}</span>`);
+            return badges.join('');
+        }
+
+        // Apply model filters
+        async function applyModelFilters() {
+            const filters = {
+                reasoning: document.getElementById('filter_reasoning').checked,
+                function_calling: document.getElementById('filter_function_calling').checked,
+                vision: document.getElementById('filter_vision').checked,
+                code_generation: document.getElementById('filter_code_generation').checked,
+                multimodal: document.getElementById('filter_multimodal').checked,
+                streaming: document.getElementById('filter_streaming').checked
+            };
+
+            const search = document.getElementById('modelSearch').value;
+            
+            try {
+                const params = new URLSearchParams();
+                
+                // Add capability filters
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value) params.append(key, 'true');
+                });
+                
+                // Add search
+                if (search) params.append('search', search);
+
+                const response = await fetch(`/api/models-view?${params}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayModels(result.data);
+                } else {
+                    showAlert('筛选模型失败: ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('筛选模型失败: ' + error.message, 'error');
+            }
+        }
+
+        // Clear model filters
+        function clearModelFilters() {
+            document.querySelectorAll('[id^="filter_"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('modelSearch').value = '';
+            displayModels(modelFamilies);
+        }
+
+        // Refresh models
+        function refreshModels() {
+            loadModels();
+        }
+
+        // Show provider details
+        function showProviderDetails(family, provider) {
+            // This could show a detailed modal or navigate to provider comparison
+            alert(`详细信息: ${family} 模型族的 ${provider} 供应商选项`);
+        }
+
+        // Add search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('modelSearch');
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(this.searchTimeout);
+                    this.searchTimeout = setTimeout(() => {
+                        applyModelFilters();
+                    }, 300);
+                });
+            }
+        });
     </script>
 </body>
 </html>
