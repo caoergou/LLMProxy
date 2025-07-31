@@ -114,8 +114,38 @@ Content-Type: application/json
     {"role": "user", "content": "Hello, world!"}
   ],
   "max_tokens": 150,
-  "temperature": 0.7
+  "temperature": 0.7,
+  "stream": false
 }
+```
+
+#### 1.1. 流式响应支持 (SSE)
+
+支持服务器发送事件 (Server-Sent Events) 的流式响应：
+
+```bash
+POST http://localhost:3000/api/v1/chat/completions
+Content-Type: application/json
+
+{
+  "model": "gpt-3.5-turbo",
+  "messages": [
+    {"role": "user", "content": "Hello, world!"}
+  ],
+  "max_tokens": 150,
+  "temperature": 0.7,
+  "stream": true
+}
+```
+
+流式响应返回 `text/event-stream` 格式，兼容 OpenAI 流式 API 规范：
+
+```
+data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1234567890,"model":"gpt-3.5-turbo","choices":[{"index":0,"delta":{"role":"assistant"},"finish_reason":null}]}
+
+data: {"id":"chatcmpl-123","object":"chat.completion.chunk","created":1234567890,"model":"gpt-3.5-turbo","choices":[{"index":0,"delta":{"content":"Hello"},"finish_reason":null}]}
+
+data: [DONE]
 ```
 
 **优势：**
@@ -123,10 +153,11 @@ Content-Type: application/json
 - 🔄 **智能提供商选择** - 自动选择最优可用提供商
 - 🗺️ **模型映射** - 透明地将 OpenAI 模型映射到不同提供商
 - ✅ **标准化错误处理** - 统一的错误响应格式
+- 🌊 **流式响应支持** - 支持 SSE (Server-Sent Events) 实时流式输出
 
 #### 2. 使用 OpenAI 客户端库
 
-**JavaScript/Node.js:**
+**JavaScript/Node.js (非流式):**
 ```javascript
 import OpenAI from 'openai';
 
@@ -139,6 +170,27 @@ const completion = await openai.chat.completions.create({
   messages: [{ role: 'user', content: 'Say hello in Chinese' }],
   model: 'gpt-3.5-turbo',
 });
+```
+
+**JavaScript/Node.js (流式):**
+```javascript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: 'dummy-key',
+  baseURL: 'http://localhost:3000/api/v1'
+});
+
+const stream = await openai.chat.completions.create({
+  messages: [{ role: 'user', content: 'Tell me a story' }],
+  model: 'gpt-3.5-turbo',
+  stream: true,
+});
+
+for await (const chunk of stream) {
+  const content = chunk.choices[0]?.delta?.content || '';
+  process.stdout.write(content);
+}
 ```
 
 **Python:**

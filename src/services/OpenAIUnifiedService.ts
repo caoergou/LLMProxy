@@ -1,9 +1,10 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { Response } from 'express';
 import ApiKeyModel from '../models/ApiKey';
 import ApiCallModel from '../models/ApiCall';
 import ProviderConfigLoader from '../utils/ProviderConfigLoader';
 import ModelRegistry from './ModelRegistry';
-import { FormatAdapterFactory, BaseFormatAdapter, OpenAIRequest, OpenAIResponse, OpenAIError } from './FormatAdapter';
+import { FormatAdapterFactory, BaseFormatAdapter, OpenAIRequest, OpenAIResponse, OpenAIError, OpenAIStreamChunk } from './FormatAdapter';
 import { ApiKeyData, ProxyResult } from '../types';
 
 interface UnifiedRequestOptions {
@@ -31,7 +32,7 @@ class OpenAIUnifiedService {
   }
 
   /**
-   * Unified chat completions endpoint - OpenAI compliant
+   * Unified chat completions endpoint - OpenAI compliant with streaming support
    */
   async chatCompletions(
     request: OpenAIRequest, 
@@ -130,6 +131,138 @@ class OpenAIUnifiedService {
       };
 
     } catch (error) {
+      return {
+        success: false,
+        error: {
+          error: {
+            message: (error as Error).message,
+            type: 'server_error'
+          }
+        },
+        metadata: {
+          response_time: Date.now() - startTime
+        }
+      };
+    }
+  }
+
+  /**
+   * Streaming chat completions endpoint - OpenAI compliant SSE
+   */
+  async chatCompletionsStream(
+    request: OpenAIRequest,
+    res: Response,
+    options: UnifiedRequestOptions = {}
+  ): Promise<{ success: boolean; error?: OpenAIError; metadata?: any }> {
+    const startTime = Date.now();
+
+    try {
+      // Validate request
+      const validationError = this.validateChatRequest(request);
+      if (validationError) {
+        return {
+          success: false,
+          error: {
+            error: {
+              message: validationError,
+              type: 'invalid_request_error'
+            }
+          }
+        };
+      }
+
+      // Select provider and model
+      const { provider, apiKey, adaptedRequest } = await this.selectProviderAndAdaptRequest(request, options);
+      
+      if (!provider || !apiKey) {
+        return {
+          success: false,
+          error: {
+            error: {
+              message: 'No suitable provider or API key available',
+              type: 'invalid_request_error'
+            }
+          }
+        };
+      }
+
+      // Get adapter
+      const adapter = this.adapters.get(provider);
+      if (!adapter) {
+        return {
+          success: false,
+          error: {
+            error: {
+              message: `No format adapter available for provider: ${provider}`,
+              type: 'server_error'
+            }
+          }
+        };
+      }
+
+      // Check if adapter supports streaming
+      if (!adapter.supportsStreaming()) {
+        return {
+          success: false,
+          error: {
+            error: {
+              message: `Provider ${provider} does not support streaming`,
+              type: 'invalid_request_error'
+            }
+          }
+        };
+      }
+
+      // Set SSE headers
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Headers', 'Cache-Control');
+
+      // Make streaming request to provider
+      const streamResponse = await this.makeProviderStreamRequest(
+        provider,
+        apiKey,
+        adaptedRequest,
+        adapter,
+        request,
+        res
+      );
+
+      // Log successful call
+      await this.logApiCall(
+        apiKey.id!,
+        '/chat/completions',
+        'POST',
+        request,
+        200,
+        Date.now() - startTime,
+        apiKey.cost_per_request || 0
+      );
+
+      return {
+        success: true,
+        metadata: {
+          provider,
+          api_key_name: apiKey.name,
+          response_time: Date.now() - startTime,
+          cost: apiKey.cost_per_request
+        }
+      };
+
+    } catch (error) {
+      // Send error as SSE event if headers already sent
+      if (res.headersSent) {
+        res.write(`data: ${JSON.stringify({
+          error: {
+            message: (error as Error).message,
+            type: 'server_error'
+          }
+        })}\n\n`);
+        res.end();
+      }
+
       return {
         success: false,
         error: {
@@ -372,6 +505,110 @@ class OpenAIUnifiedService {
         error: error.response?.data || error,
         status: error.response?.status || 500
       };
+    }
+  }
+
+  private async makeProviderStreamRequest(
+    provider: string,
+    apiKey: ApiKeyData,
+    data: any,
+    adapter: BaseFormatAdapter,
+    originalRequest: OpenAIRequest,
+    res: Response
+  ): Promise<void> {
+    const providerConfig = ProviderConfigLoader.getProvider(provider);
+    if (!providerConfig) {
+      throw new Error(`Provider configuration not found: ${provider}`);
+    }
+
+    // Determine the correct endpoint based on provider
+    let actualEndpoint = '/v1/messages';
+    if (provider === 'anthropic') {
+      actualEndpoint = '/v1/messages';
+    } else if (provider === 'openai' || provider === 'azure') {
+      actualEndpoint = '/chat/completions';
+    }
+
+    const requestConfig: AxiosRequestConfig = {
+      method: 'post',
+      url: `${apiKey.base_url}${actualEndpoint}`,
+      data: data,
+      headers: this.buildHeaders(provider, apiKey),
+      timeout: 60000, // Longer timeout for streaming
+      responseType: 'stream'
+    };
+
+    try {
+      const response = await axios(requestConfig);
+      
+      // Update quota if applicable
+      if (apiKey.remaining_quota !== undefined && apiKey.remaining_quota > 0) {
+        await ApiKeyModel.updateQuota(apiKey.id!, apiKey.remaining_quota - 1);
+      }
+
+      let buffer = '';
+
+      response.data.on('data', (chunk: Buffer) => {
+        buffer += chunk.toString();
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || ''; // Keep incomplete line in buffer
+
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (trimmed.startsWith('data: ')) {
+            const jsonData = trimmed.slice(6);
+            
+            if (jsonData === '[DONE]') {
+              res.write('data: [DONE]\n\n');
+              res.end();
+              return;
+            }
+
+            try {
+              const providerChunk = JSON.parse(jsonData);
+              const openaiChunk = adapter.adaptStreamChunk(providerChunk, originalRequest);
+              
+              if (openaiChunk) {
+                res.write(`data: ${JSON.stringify(openaiChunk)}\n\n`);
+              }
+            } catch (e) {
+              // Skip invalid JSON chunks
+              console.warn('Failed to parse streaming chunk:', e);
+            }
+          }
+        }
+      });
+
+      response.data.on('end', () => {
+        if (!res.headersSent && !res.destroyed) {
+          res.write('data: [DONE]\n\n');
+          res.end();
+        }
+      });
+
+      response.data.on('error', (error: Error) => {
+        if (!res.headersSent && !res.destroyed) {
+          res.write(`data: ${JSON.stringify({
+            error: {
+              message: error.message,
+              type: 'server_error'
+            }
+          })}\n\n`);
+          res.end();
+        }
+      });
+
+    } catch (error: any) {
+      if (!res.headersSent && !res.destroyed) {
+        res.write(`data: ${JSON.stringify({
+          error: {
+            message: error.response?.data || error.message,
+            type: 'server_error'
+          }
+        })}\n\n`);
+        res.end();
+      }
+      throw error;
     }
   }
 

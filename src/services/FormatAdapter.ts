@@ -49,6 +49,23 @@ export interface OpenAIResponse {
   };
 }
 
+export interface OpenAIStreamChunk {
+  id: string;
+  object: string;
+  created: number;
+  model: string;
+  choices: {
+    index: number;
+    delta: {
+      role?: string;
+      content?: string;
+      function_call?: any;
+      tool_calls?: any[];
+    };
+    finish_reason?: string;
+  }[];
+}
+
 export interface OpenAIError {
   error: {
     message: string;
@@ -70,6 +87,11 @@ export abstract class BaseFormatAdapter {
   abstract adaptError(providerError: any): OpenAIError;
   abstract mapModelName(openaiModel: string): string;
   abstract reverseMapModelName(providerModel: string): string;
+  
+  // Streaming support methods
+  abstract adaptStreamChunk(providerChunk: any, originalRequest: OpenAIRequest): OpenAIStreamChunk | null;
+  abstract parseStreamData(data: string): any[];
+  abstract supportsStreaming(): boolean;
 }
 
 export class OpenAIFormatAdapter extends BaseFormatAdapter {
@@ -96,6 +118,37 @@ export class OpenAIFormatAdapter extends BaseFormatAdapter {
   reverseMapModelName(providerModel: string): string {
     // Direct mapping for OpenAI
     return providerModel;
+  }
+
+  adaptStreamChunk(providerChunk: any, originalRequest: OpenAIRequest): OpenAIStreamChunk | null {
+    // OpenAI format is the standard, no adaptation needed
+    return providerChunk;
+  }
+
+  parseStreamData(data: string): any[] {
+    const chunks: any[] = [];
+    const lines = data.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('data: ')) {
+        const jsonData = trimmed.slice(6); // Remove 'data: ' prefix
+        if (jsonData === '[DONE]') {
+          break;
+        }
+        try {
+          chunks.push(JSON.parse(jsonData));
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+    }
+    
+    return chunks;
+  }
+
+  supportsStreaming(): boolean {
+    return true;
   }
 }
 
@@ -133,6 +186,11 @@ export class AnthropicFormatAdapter extends BaseFormatAdapter {
       anthropicRequest.stop_sequences = Array.isArray(openaiRequest.stop) 
         ? openaiRequest.stop 
         : [openaiRequest.stop];
+    }
+
+    // Handle streaming
+    if (openaiRequest.stream) {
+      anthropicRequest.stream = true;
     }
 
     return anthropicRequest;
@@ -217,6 +275,85 @@ export class AnthropicFormatAdapter extends BaseFormatAdapter {
     };
     return mapping[anthropicType] || 'server_error';
   }
+
+  adaptStreamChunk(providerChunk: any, originalRequest: OpenAIRequest): OpenAIStreamChunk | null {
+    if (!providerChunk || providerChunk.type === 'ping') {
+      return null;
+    }
+
+    const now = Math.floor(Date.now() / 1000);
+    const chunkId = `chatcmpl-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
+
+    // Handle different Anthropic event types
+    if (providerChunk.type === 'message_start') {
+      return {
+        id: chunkId,
+        object: 'chat.completion.chunk',
+        created: now,
+        model: this.reverseMapModelName(providerChunk.message?.model) || originalRequest.model,
+        choices: [{
+          index: 0,
+          delta: {
+            role: 'assistant'
+          }
+        }]
+      };
+    }
+
+    if (providerChunk.type === 'content_block_delta' && providerChunk.delta?.text) {
+      return {
+        id: chunkId,
+        object: 'chat.completion.chunk',
+        created: now,
+        model: this.reverseMapModelName(originalRequest.model) || originalRequest.model,
+        choices: [{
+          index: 0,
+          delta: {
+            content: providerChunk.delta.text
+          }
+        }]
+      };
+    }
+
+    if (providerChunk.type === 'message_delta' && providerChunk.delta?.stop_reason) {
+      return {
+        id: chunkId,
+        object: 'chat.completion.chunk',
+        created: now,
+        model: this.reverseMapModelName(originalRequest.model) || originalRequest.model,
+        choices: [{
+          index: 0,
+          delta: {},
+          finish_reason: this.mapFinishReason(providerChunk.delta.stop_reason)
+        }]
+      };
+    }
+
+    return null;
+  }
+
+  parseStreamData(data: string): any[] {
+    const chunks: any[] = [];
+    const lines = data.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('data: ')) {
+        const jsonData = trimmed.slice(6); // Remove 'data: ' prefix
+        try {
+          chunks.push(JSON.parse(jsonData));
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+    }
+    
+    return chunks;
+  }
+
+  supportsStreaming(): boolean {
+    return true;
+  }
 }
 
 export class AzureFormatAdapter extends BaseFormatAdapter {
@@ -243,6 +380,37 @@ export class AzureFormatAdapter extends BaseFormatAdapter {
 
   reverseMapModelName(providerModel: string): string {
     return providerModel;
+  }
+
+  adaptStreamChunk(providerChunk: any, originalRequest: OpenAIRequest): OpenAIStreamChunk | null {
+    // Azure uses OpenAI format, mostly compatible
+    return providerChunk;
+  }
+
+  parseStreamData(data: string): any[] {
+    const chunks: any[] = [];
+    const lines = data.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (trimmed.startsWith('data: ')) {
+        const jsonData = trimmed.slice(6); // Remove 'data: ' prefix
+        if (jsonData === '[DONE]') {
+          break;
+        }
+        try {
+          chunks.push(JSON.parse(jsonData));
+        } catch (e) {
+          // Skip invalid JSON
+        }
+      }
+    }
+    
+    return chunks;
+  }
+
+  supportsStreaming(): boolean {
+    return true;
   }
 }
 
