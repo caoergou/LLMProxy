@@ -4,7 +4,8 @@ import {
   ModelProviderInfo, 
   ExtendedModelInfo, 
   ProviderConfig, 
-  ModelCapabilities 
+  ModelCapabilities,
+  ModelFamilyWithAvgPrice
 } from '../types';
 
 class ModelAggregationService {

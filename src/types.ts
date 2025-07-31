@@ -201,3 +201,7 @@ export interface ModelFamilyDetailResponse {
   success: boolean;
   data: ModelFamilyInfo;
 }
+
+export interface ModelFamilyWithAvgPrice extends ModelFamilyInfo {
+  avgPrice: number;
+}

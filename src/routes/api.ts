@@ -7,7 +7,7 @@ import ModelRegistry from '../services/ModelRegistry';
 import ModelAggregationService from '../services/ModelAggregationService';
 import Database from '../models/Database';
 import ProviderConfigLoader from '../utils/ProviderConfigLoader';
-import { TimeRange } from '../types';
+import { TimeRange, ModelCapabilities } from '../types';
 
 const router = Router();
 
