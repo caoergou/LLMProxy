@@ -61,15 +61,23 @@ router.get('/providers', async (req: Request, res: Response) => {
 router.get('/provider-configs', async (req: Request, res: Response) => {
     try {
         const providers = ProviderConfigLoader.getAllProviders();
-        // Return only necessary info for frontend
+        // Return enhanced info for frontend including new fields
         const frontendProviders = providers.map(provider => ({
             provider: provider.provider,
             name: provider.name,
             display_name: provider.display_name,
+            description: provider.description,
             base_url: provider.base_url,
             cost_per_request: provider.cost_per_request,
             models: provider.models || [],
-            icon: provider.icon || '🤖'
+            icon: provider.icon || '🤖',
+            real_icon_url: provider.real_icon_url,
+            website: provider.website,
+            documentation: provider.documentation,
+            console_url: provider.console_url,
+            registration_guide: provider.registration_guide,
+            promotions: provider.promotions,
+            additional_info: provider.additional_info
         }));
         res.json({ success: true, data: frontendProviders });
     } catch (error) {

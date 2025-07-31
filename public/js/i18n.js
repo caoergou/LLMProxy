@@ -15,6 +15,7 @@ class I18n {
                 
                 // Navigation tabs
                 'nav.dashboard': '仪表板',
+                'nav.providers': '模型供应商',
                 'nav.keys': 'API 密钥',
                 'nav.logs': '调用日志',
                 'nav.settings': '设置',
@@ -109,11 +110,17 @@ class I18n {
                 'msg.loading_stats_failed': '加载统计数据失败',
                 'msg.loading_keys_failed': '加载 API 密钥失败',
                 'msg.loading_calls_failed': '加载调用日志失败',
+                'msg.loading_providers_failed': '加载供应商信息失败',
                 'msg.key_added': 'API 密钥添加成功',
                 'msg.key_updated': 'API 密钥更新成功',
                 'msg.key_deleted': 'API 密钥删除成功',
                 'msg.operation_failed': '操作失败',
                 'msg.delete_confirm': '确定要删除这个 API 密钥吗？',
+                
+                // Providers
+                'providers.title': '模型供应商',
+                'providers.loading': '加载供应商信息中...',
+                'providers.no_providers': '暂无供应商信息',
                 
                 // Language selector
                 'lang.chinese': '中文',
@@ -126,6 +133,7 @@ class I18n {
                 
                 // Navigation tabs
                 'nav.dashboard': 'Dashboard',
+                'nav.providers': 'Model Providers',
                 'nav.keys': 'API Keys',
                 'nav.logs': 'Call Logs',
                 'nav.settings': 'Settings',
@@ -220,11 +228,17 @@ class I18n {
                 'msg.loading_stats_failed': 'Failed to load statistics',
                 'msg.loading_keys_failed': 'Failed to load API keys',
                 'msg.loading_calls_failed': 'Failed to load call logs',
+                'msg.loading_providers_failed': 'Failed to load provider information',
                 'msg.key_added': 'API key added successfully',
                 'msg.key_updated': 'API key updated successfully',
                 'msg.key_deleted': 'API key deleted successfully',
                 'msg.operation_failed': 'Operation failed',
                 'msg.delete_confirm': 'Are you sure you want to delete this API key?',
+                
+                // Providers
+                'providers.title': 'Model Providers',
+                'providers.loading': 'Loading provider information...',
+                'providers.no_providers': 'No provider information available',
                 
                 // Language selector
                 'lang.chinese': '中文',

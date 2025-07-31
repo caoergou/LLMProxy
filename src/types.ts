@@ -38,6 +38,7 @@ export interface ProviderConfig {
   provider: string;
   name: string;
   display_name?: string;
+  description?: string;
   base_url: string;
   auth_type: string;
   request_format?: string;
@@ -45,8 +46,15 @@ export interface ProviderConfig {
   cost_per_request?: number;
   endpoints?: any;
   headers?: Record<string, string>;
-  models?: string[];
+  models?: any[];
   icon?: string;
+  real_icon_url?: string;
+  website?: string;
+  documentation?: string;
+  console_url?: string;
+  registration_guide?: string; // markdown content
+  promotions?: string; // markdown content
+  additional_info?: string; // markdown content
 }
 
 export interface ProxyResult {

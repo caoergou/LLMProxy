@@ -284,6 +284,191 @@
             outline: none;
             border-color: #2563eb;
         }
+
+        .provider-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .provider-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .provider-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: #f3f4f6;
+        }
+
+        .provider-icon img {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+        }
+
+        .provider-title {
+            flex: 1;
+        }
+
+        .provider-title h4 {
+            margin: 0 0 5px 0;
+            color: #2563eb;
+            font-size: 18px;
+        }
+
+        .provider-title p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .provider-links {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .provider-link {
+            padding: 6px 12px;
+            background: #f3f4f6;
+            color: #374151;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 12px;
+            transition: background 0.3s;
+        }
+
+        .provider-link:hover {
+            background: #e5e7eb;
+        }
+
+        .provider-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .provider-models {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .provider-models h5 {
+            margin: 0 0 10px 0;
+            color: #374151;
+        }
+
+        .model-item {
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            border-left: 3px solid #2563eb;
+        }
+
+        .model-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .model-name {
+            font-weight: 500;
+            color: #2563eb;
+            margin-bottom: 2px;
+        }
+
+        .model-desc {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .provider-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .provider-info h5 {
+            margin: 0 0 10px 0;
+            color: #374151;
+        }
+
+        .info-section {
+            background: white;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .info-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-section h6 {
+            margin: 0 0 8px 0;
+            color: #2563eb;
+            font-size: 14px;
+        }
+
+        .info-section .markdown-content {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #374151;
+        }
+
+        .markdown-content h2 {
+            font-size: 16px;
+            margin: 15px 0 8px 0;
+            color: #2563eb;
+        }
+
+        .markdown-content h3 {
+            font-size: 14px;
+            margin: 12px 0 6px 0;
+            color: #374151;
+        }
+
+        .markdown-content ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+
+        .markdown-content li {
+            margin-bottom: 4px;
+        }
+
+        .markdown-content a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .markdown-content a:hover {
+            text-decoration: underline;
+        }
+
+        .markdown-content code {
+            background: #f3f4f6;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .markdown-content strong {
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -303,6 +488,7 @@
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('dashboard')" data-i18n="nav.dashboard">仪表板</button>
+            <button class="tab" onclick="switchTab('providers')" data-i18n="nav.providers">模型供应商</button>
             <button class="tab" onclick="switchTab('keys')" data-i18n="nav.keys">API 密钥</button>
             <button class="tab" onclick="switchTab('logs')" data-i18n="nav.logs">调用日志</button>
             <button class="tab" onclick="switchTab('settings')" data-i18n="nav.settings">设置</button>
@@ -340,6 +526,14 @@
             <h3 style="margin-bottom: 15px;" data-i18n="dashboard.recent_calls">最近调用</h3>
             <div id="recentCalls">
                 <div class="loading" data-i18n="dashboard.loading_calls">加载最近调用记录中...</div>
+            </div>
+        </div>
+
+        <!-- Providers Tab -->
+        <div id="providers" class="tab-content">
+            <h3 style="margin-bottom: 20px;" data-i18n="providers.title">模型供应商</h3>
+            <div id="providersContainer">
+                <div class="loading" data-i18n="providers.loading">加载供应商信息中...</div>
             </div>
         </div>
 
@@ -740,6 +934,8 @@
             } else if (tabName === 'dashboard') {
                 loadStats();
                 loadRecentCalls();
+            } else if (tabName === 'providers') {
+                loadProviders();
             }
         }
 
@@ -1107,6 +1303,117 @@
             if (event.target === modal) {
                 closeKeyModal();
             }
+        }
+
+        // Load providers information
+        async function loadProviders() {
+            try {
+                const response = await fetch('/api/provider-configs');
+                const result = await response.json();
+                
+                if (result.success) {
+                    displayProviders(result.data);
+                } else {
+                    showAlert(i18n.t('msg.loading_providers_failed') + ': ' + result.error, 'error');
+                }
+            } catch (error) {
+                showAlert(i18n.t('msg.loading_providers_failed') + ': ' + error.message, 'error');
+            }
+        }
+
+        function displayProviders(providers) {
+            const container = document.getElementById('providersContainer');
+            
+            if (providers.length === 0) {
+                container.innerHTML = `<div class="loading">${i18n.t('providers.no_providers')}</div>`;
+                return;
+            }
+            
+            const providersHtml = providers.map(provider => `
+                <div class="provider-card">
+                    <div class="provider-header">
+                        <div class="provider-icon">
+                            ${provider.real_icon_url 
+                                ? `<img src="${provider.real_icon_url}" alt="${provider.display_name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                   <span style="display: none;">${provider.icon || '🤖'}</span>`
+                                : (provider.icon || '🤖')
+                            }
+                        </div>
+                        <div class="provider-title">
+                            <h4>${provider.display_name || provider.name}</h4>
+                            <p>${provider.description || ''}</p>
+                        </div>
+                        <div class="provider-links">
+                            ${provider.website ? `<a href="${provider.website}" target="_blank" class="provider-link">官网</a>` : ''}
+                            ${provider.documentation ? `<a href="${provider.documentation}" target="_blank" class="provider-link">文档</a>` : ''}
+                            ${provider.console_url ? `<a href="${provider.console_url}" target="_blank" class="provider-link">控制台</a>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="provider-content">
+                        <div class="provider-models">
+                            <h5>支持的模型</h5>
+                            ${(provider.models || []).map(model => `
+                                <div class="model-item">
+                                    <div class="model-name">${model.display_name || model.name}</div>
+                                    <div class="model-desc">${model.description || ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="provider-info">
+                            <h5>详细信息</h5>
+                            ${provider.registration_guide ? `
+                                <div class="info-section">
+                                    <h6>注册指南</h6>
+                                    <div class="markdown-content">${renderMarkdown(provider.registration_guide)}</div>
+                                </div>
+                            ` : ''}
+                            ${provider.promotions ? `
+                                <div class="info-section">
+                                    <h6>优惠信息</h6>
+                                    <div class="markdown-content">${renderMarkdown(provider.promotions)}</div>
+                                </div>
+                            ` : ''}
+                            ${provider.additional_info ? `
+                                <div class="info-section">
+                                    <h6>使用说明</h6>
+                                    <div class="markdown-content">${renderMarkdown(provider.additional_info)}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            container.innerHTML = providersHtml;
+        }
+
+        // Simple markdown renderer for basic formatting
+        function renderMarkdown(markdown) {
+            if (!markdown) return '';
+            
+            return markdown
+                // Headers
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                // Bold
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Links
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                // Line breaks
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                // Wrap in paragraphs
+                .replace(/^(.*)$/gim, '<p>$1</p>')
+                // Clean up empty paragraphs
+                .replace(/<p><\/p>/g, '')
+                // Lists (simple implementation)
+                .replace(/^- (.*)$/gim, '<li>$1</li>')
+                .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+                // Code (simple implementation)
+                .replace(/`([^`]+)`/g, '<code>$1</code>');
         }
     </script>
 </body>
