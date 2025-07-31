@@ -205,10 +205,75 @@ router.get('/v1/models', async (req, res) => {
     }
 });
 
+// Get information about a specific model
+router.get('/v1/models/:model', async (req, res) => {
+    try {
+        const modelName = req.params.model;
+        const provider = await ProxyService.getProviderForModel(modelName);
+        
+        if (!provider) {
+            return res.status(404).json({
+                error: {
+                    message: `Model '${modelName}' not found`,
+                    type: 'invalid_request_error',
+                    code: 'model_not_found'
+                }
+            });
+        }
+        
+        const providers = ProviderConfigLoader.getAllProviders();
+        const providerConfig = providers.find(p => p.provider === provider);
+        const model = providerConfig.models.find(m => m.name === modelName);
+        
+        res.json({
+            id: model.name,
+            object: 'model',
+            created: Date.now(),
+            owned_by: provider,
+            permission: [],
+            root: model.name,
+            parent: null,
+            provider: provider,
+            display_name: model.display_name,
+            description: model.description,
+            provider_name: providerConfig.display_name
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            error: {
+                message: error.message,
+                type: 'api_error',
+                code: 'internal_server_error'
+            }
+        });
+    }
+});
+
 // OpenAI-compatible chat completions endpoint
 router.post('/v1/chat/completions', async (req, res) => {
     try {
         const data = req.body;
+        
+        // Validate required fields
+        if (!data.model) {
+            return res.status(400).json({
+                error: {
+                    message: "Missing required parameter: 'model'",
+                    type: 'invalid_request_error',
+                    code: 'missing_parameter'
+                }
+            });
+        }
+        
+        if (!data.messages || !Array.isArray(data.messages)) {
+            return res.status(400).json({
+                error: {
+                    message: "Missing or invalid required parameter: 'messages'",
+                    type: 'invalid_request_error',
+                    code: 'missing_parameter'
+                }
+            });
+        }
         
         // Determine provider based on model name
         const provider = await ProxyService.getProviderForModel(data.model);
@@ -252,6 +317,17 @@ router.post('/v1/chat/completions', async (req, res) => {
 router.post('/v1/completions', async (req, res) => {
     try {
         const data = req.body;
+        
+        // Validate required fields
+        if (!data.model) {
+            return res.status(400).json({
+                error: {
+                    message: "Missing required parameter: 'model'",
+                    type: 'invalid_request_error',
+                    code: 'missing_parameter'
+                }
+            });
+        }
         
         // Determine provider based on model name
         const provider = await ProxyService.getProviderForModel(data.model);

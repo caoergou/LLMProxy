@@ -222,6 +222,7 @@ class ProxyService {
     async getProviderForModel(modelName) {
         const providers = this.providerConfig.getAllProviders();
         
+        // First try exact match
         for (const provider of providers) {
             if (provider.models) {
                 for (const model of provider.models) {
@@ -232,19 +233,64 @@ class ProxyService {
             }
         }
         
-        // If exact match not found, try partial matching for common model names
+        // If exact match not found, try case-insensitive match
+        const lowerModelName = modelName.toLowerCase();
+        for (const provider of providers) {
+            if (provider.models) {
+                for (const model of provider.models) {
+                    if (model.name.toLowerCase() === lowerModelName) {
+                        return provider.provider;
+                    }
+                }
+            }
+        }
+        
+        // Try partial matching for common model name variations
         for (const provider of providers) {
             if (provider.models) {
                 for (const model of provider.models) {
                     // Handle common variations like gpt-3.5-turbo vs gpt-35-turbo
-                    const normalizedModelName = modelName.replace(/[-_]/g, '');
-                    const normalizedConfigName = model.name.replace(/[-_]/g, '');
+                    const normalizedModelName = modelName.replace(/[-_.]/g, '').toLowerCase();
+                    const normalizedConfigName = model.name.replace(/[-_.]/g, '').toLowerCase();
                     
-                    if (normalizedConfigName.includes(normalizedModelName) || 
-                        normalizedModelName.includes(normalizedConfigName)) {
+                    if (normalizedConfigName === normalizedModelName) {
                         return provider.provider;
                     }
                 }
+            }
+        }
+        
+        // Try substring matching for broader compatibility
+        for (const provider of providers) {
+            if (provider.models) {
+                for (const model of provider.models) {
+                    const normalizedModelName = modelName.replace(/[-_.]/g, '').toLowerCase();
+                    const normalizedConfigName = model.name.replace(/[-_.]/g, '').toLowerCase();
+                    
+                    // Check if either contains the other (with minimum length to avoid false positives)
+                    if (normalizedModelName.length >= 5 && normalizedConfigName.length >= 5) {
+                        if (normalizedConfigName.includes(normalizedModelName) || 
+                            normalizedModelName.includes(normalizedConfigName)) {
+                            return provider.provider;
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Try matching common model family names
+        const modelFamilyMapping = {
+            'gpt4': 'openai',
+            'gpt3': 'openai', 
+            'gpt35': 'openai',
+            'claude3': 'anthropic',
+            'claude': 'anthropic'
+        };
+        
+        const cleanModelName = modelName.replace(/[-_.]/g, '').toLowerCase();
+        for (const [family, provider] of Object.entries(modelFamilyMapping)) {
+            if (cleanModelName.includes(family)) {
+                return provider;
             }
         }
         

@@ -96,9 +96,81 @@ npm start
 
 ## 🔧 使用说明
 
-### API 接口
+### 🌟 OpenAI 兼容 API 接口（推荐）
 
-#### 1. 统一聊天接口
+为了提供业界标准的统一调用方式，我们新增了完全兼容 OpenAI API 格式的接口：
+
+#### 1. 获取所有可用模型
+
+```bash
+GET http://localhost:3000/api/v1/models
+```
+
+返回所有提供商的模型列表，格式完全兼容 OpenAI API：
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "gpt-3.5-turbo",
+      "object": "model",
+      "owned_by": "openai",
+      "provider": "openai",
+      "display_name": "GPT-3.5 Turbo",
+      "description": "Fast and efficient model for most tasks"
+    },
+    {
+      "id": "claude-3-haiku-20240307",
+      "object": "model", 
+      "owned_by": "anthropic",
+      "provider": "anthropic",
+      "display_name": "Claude 3 Haiku",
+      "description": "Fast and efficient for simple tasks"
+    }
+  ]
+}
+```
+
+#### 2. 统一聊天接口（自动选择提供商）
+
+```bash
+POST http://localhost:3000/api/v1/chat/completions
+Content-Type: application/json
+
+{
+  "model": "gpt-3.5-turbo",
+  "messages": [
+    {"role": "user", "content": "Hello, world!"}
+  ]
+}
+```
+
+**特性**：
+- 🎯 **自动提供商识别**：无需指定 provider，系统会根据模型名称自动选择对应的提供商
+- 🔄 **格式自动转换**：自动适配不同提供商的请求/响应格式
+- ✅ **完全兼容 OpenAI**：可直接替换 OpenAI API 调用
+
+支持的模型包括：
+- **OpenAI**: `gpt-4`, `gpt-4-turbo`, `gpt-3.5-turbo`
+- **Anthropic**: `claude-3-opus-20240229`, `claude-3-sonnet-20240229`, `claude-3-haiku-20240307`
+- **Azure OpenAI**: `gpt-4`, `gpt-4-32k`, `gpt-35-turbo`
+
+#### 3. 传统 Completions 接口
+
+```bash
+POST http://localhost:3000/api/v1/completions
+Content-Type: application/json
+
+{
+  "model": "gpt-3.5-turbo",
+  "prompt": "Hello, world!"
+}
+```
+
+### 📚 传统 API 接口（保持兼容）
+
+#### 1. 指定提供商的聊天接口
 
 ```bash
 POST http://localhost:3000/api/chat/completions?provider=openai
@@ -140,6 +212,29 @@ GET http://localhost:3000/api/health
 2. **API 密钥管理**: 添加、编辑、删除 API 密钥
 3. **调用日志**: 查看详细的 API 调用记录
 4. **系统设置**: 配置系统参数
+
+### 🔀 迁移指南
+
+#### 从传统接口迁移到 v1 接口
+
+**旧的调用方式**：
+```bash
+POST /api/chat/completions?provider=openai
+```
+
+**新的推荐方式**：
+```bash
+POST /api/v1/chat/completions
+# 无需指定 provider，系统自动识别
+```
+
+**优势**：
+- ✅ 完全兼容 OpenAI SDK 和工具
+- ✅ 无需手动指定提供商
+- ✅ 标准化的错误响应格式
+- ✅ 更好的工具生态系统支持
+
+**现有代码无需更改**：所有传统接口仍然保持可用，确保向后兼容。
 
 ## 🔒 安全特性
 
