@@ -95,8 +95,9 @@ async function main() {
   
   // Start the server in background
   const { spawn } = require('child_process');
+  const serverPath = process.env.API_PROXY_PATH || process.cwd();
   const serverProcess = spawn('npm', ['start'], {
-    cwd: '/home/runner/work/api-proxy/api-proxy',
+    cwd: serverPath,
     stdio: 'pipe'
   });
   

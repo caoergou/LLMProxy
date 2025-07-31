@@ -580,14 +580,14 @@ class OpenAIUnifiedService {
       });
 
       response.data.on('end', () => {
-        if (!res.headersSent || !res.destroyed) {
+        if (!res.headersSent && !res.destroyed) {
           res.write('data: [DONE]\n\n');
           res.end();
         }
       });
 
       response.data.on('error', (error: Error) => {
-        if (!res.headersSent || !res.destroyed) {
+        if (!res.headersSent && !res.destroyed) {
           res.write(`data: ${JSON.stringify({
             error: {
               message: error.message,
@@ -599,7 +599,7 @@ class OpenAIUnifiedService {
       });
 
     } catch (error: any) {
-      if (!res.headersSent || !res.destroyed) {
+      if (!res.headersSent && !res.destroyed) {
         res.write(`data: ${JSON.stringify({
           error: {
             message: error.response?.data || error.message,

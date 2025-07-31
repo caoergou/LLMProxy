@@ -282,7 +282,7 @@ export class AnthropicFormatAdapter extends BaseFormatAdapter {
     }
 
     const now = Math.floor(Date.now() / 1000);
-    const chunkId = `chatcmpl-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const chunkId = `chatcmpl-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`;
 
     // Handle different Anthropic event types
     if (providerChunk.type === 'message_start') {
