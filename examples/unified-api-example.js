@@ -114,7 +114,7 @@ async function demonstrateUnifiedAPI() {
     }
 }
 
-// JavaScript 示例：使用 OpenAI 客户端库
+// JavaScript 示例：展示如何使用 OpenAI 客户端库的代码片段
 function showJavaScriptExample() {
     console.log('\n📝 JavaScript 调用示例:');
     console.log('====================');
