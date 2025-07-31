@@ -112,7 +112,7 @@ const stream = await openai.chat.completions.create({
 
 for await (const chunk of stream) {
   const content = chunk.choices[0]?.delta?.content || '';
-  process.stdout.write(content);
+  process.stdout.write(content || '');
 }
 ```
 
