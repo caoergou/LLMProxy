@@ -407,7 +407,17 @@ class OpenAIUnifiedService {
     requestData: any,
     responseStatus: number,
     responseTime: number,
-    cost: number
+    cost: number,
+    enhancedMetrics?: {
+      firstByteTime?: number;
+      tokensPrompt?: number;
+      tokensCompletion?: number;
+      tokensTotal?: number;
+      requestSize?: number;
+      responseSize?: number;
+      modelUsed?: string;
+      providerResponseTime?: number;
+    }
   ): Promise<void> {
     try {
       await ApiCallModel.create({
@@ -417,7 +427,16 @@ class OpenAIUnifiedService {
         request_data: requestData,
         response_status: responseStatus,
         response_time: responseTime,
-        cost
+        cost,
+        // Enhanced metrics
+        first_byte_time: enhancedMetrics?.firstByteTime,
+        tokens_prompt: enhancedMetrics?.tokensPrompt,
+        tokens_completion: enhancedMetrics?.tokensCompletion,
+        tokens_total: enhancedMetrics?.tokensTotal,
+        request_size: enhancedMetrics?.requestSize,
+        response_size: enhancedMetrics?.responseSize,
+        model_used: enhancedMetrics?.modelUsed,
+        provider_response_time: enhancedMetrics?.providerResponseTime
       });
     } catch (error) {
       console.error('Failed to log API call:', error);

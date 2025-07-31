@@ -21,9 +21,17 @@ class ProxyService {
 
     async proxyRequest(provider: string, endpoint: string, method: string, data: any, headers: Record<string, string> = {}): Promise<ProxyResult> {
         const startTime = Date.now();
+        let firstByteTime: number | undefined;
         let selectedApiKey: ApiKeyData | null = null;
         let response: AxiosResponse | null = null;
         let error: Error | null = null;
+        let requestSize = 0;
+        let responseSize = 0;
+        let tokensUsed = {
+            prompt: 0,
+            completion: 0,
+            total: 0
+        };
 
         try {
             // Get optimal API key for provider
@@ -35,20 +43,41 @@ class ProxyService {
             // Adapt request format if needed
             const adaptedData = await this.adaptRequestFormat(provider, data);
             
+            // Calculate request size
+            requestSize = JSON.stringify(adaptedData).length;
+            
             // Prepare request
             const requestConfig: AxiosRequestConfig = {
                 method: method.toLowerCase() as any,
                 url: `${selectedApiKey.base_url}${endpoint}`,
                 data: adaptedData,
                 headers: this.buildHeaders(selectedApiKey, headers),
-                timeout: 30000
+                timeout: 30000,
+                // Track first byte time
+                onDownloadProgress: (progressEvent) => {
+                    if (!firstByteTime) {
+                        firstByteTime = Date.now() - startTime;
+                    }
+                }
             };
 
             // Make request
+            const providerStartTime = Date.now();
             response = await axios(requestConfig);
+            const providerResponseTime = Date.now() - providerStartTime;
             
             if (!response) {
                 throw new Error('No response received from API');
+            }
+            
+            // Calculate response size
+            responseSize = JSON.stringify(response.data).length;
+            
+            // Extract token usage from response if available
+            if (response.data && response.data.usage) {
+                tokensUsed.prompt = response.data.usage.prompt_tokens || 0;
+                tokensUsed.completion = response.data.usage.completion_tokens || 0;
+                tokensUsed.total = response.data.usage.total_tokens || tokensUsed.prompt + tokensUsed.completion;
             }
             
             // Adapt response format
@@ -61,25 +90,64 @@ class ProxyService {
                 throw new Error(`Quota exhausted for API key: ${selectedApiKey.name}`);
             }
 
-            // Log successful call
-            await this.logApiCall(selectedApiKey.id!, endpoint, method, data, response.status, Date.now() - startTime, selectedApiKey.cost_per_request || 0);
+            const totalResponseTime = Date.now() - startTime;
+
+            // Log successful call with enhanced metrics
+            await this.logApiCall(
+                selectedApiKey.id!, 
+                endpoint, 
+                method, 
+                data, 
+                response.status, 
+                totalResponseTime, 
+                selectedApiKey.cost_per_request || 0,
+                {
+                    firstByteTime: firstByteTime || totalResponseTime,
+                    tokensPrompt: tokensUsed.prompt,
+                    tokensCompletion: tokensUsed.completion,
+                    tokensTotal: tokensUsed.total,
+                    requestSize,
+                    responseSize,
+                    modelUsed: adaptedData?.model || data?.model || 'unknown',
+                    providerResponseTime
+                }
+            );
 
             return {
                 success: true,
                 data: adaptedResponse,
                 provider: provider,
                 api_key_name: selectedApiKey.name,
-                response_time: Date.now() - startTime,
+                response_time: totalResponseTime,
                 cost: selectedApiKey.cost_per_request
             };
 
         } catch (err) {
             error = err as Error;
             const responseStatus = (err as any).response ? (err as any).response.status : 500;
+            const totalResponseTime = Date.now() - startTime;
             
             // Log failed call
             if (selectedApiKey) {
-                await this.logApiCall(selectedApiKey?.id || 0, endpoint, method, data, responseStatus, Date.now() - startTime, 0);
+                await this.logApiCall(
+                    selectedApiKey?.id || 0, 
+                    endpoint, 
+                    method, 
+                    data, 
+                    responseStatus, 
+                    totalResponseTime, 
+                    0,
+                    {
+                        firstByteTime: firstByteTime || totalResponseTime,
+                        tokensPrompt: 0,
+                        tokensCompletion: 0,
+                        tokensTotal: 0,
+                        requestSize: JSON.stringify(data).length,
+                        responseSize: 0,
+                        modelUsed: data?.model || 'unknown',
+                        providerResponseTime: totalResponseTime
+                    }
+                );
             }
 
             return {
@@ -88,7 +156,7 @@ class ProxyService {
                 status: responseStatus,
                 provider: provider,
                 api_key_name: selectedApiKey ? selectedApiKey.name : 'none',
-                response_time: Date.now() - startTime
+                response_time: totalResponseTime
             };
         }
     }
@@ -202,7 +270,25 @@ class ProxyService {
         return data;
     }
 
-    private async logApiCall(apiKeyId: number, endpoint: string, method: string, requestData: any, responseStatus: number, responseTime: number, cost: number): Promise<void> {
+    private async logApiCall(
+        apiKeyId: number, 
+        endpoint: string, 
+        method: string, 
+        requestData: any, 
+        responseStatus: number, 
+        responseTime: number, 
+        cost: number,
+        enhancedMetrics?: {
+            firstByteTime?: number;
+            tokensPrompt?: number;
+            tokensCompletion?: number;
+            tokensTotal?: number;
+            requestSize?: number;
+            responseSize?: number;
+            modelUsed?: string;
+            providerResponseTime?: number;
+        }
+    ): Promise<void> {
         try {
             await ApiCallModel.create({
                 api_key_id: apiKeyId,
@@ -211,7 +297,16 @@ class ProxyService {
                 request_data: requestData,
                 response_status: responseStatus,
                 response_time: responseTime,
-                cost
+                cost,
+                // Enhanced metrics
+                first_byte_time: enhancedMetrics?.firstByteTime,
+                tokens_prompt: enhancedMetrics?.tokensPrompt,
+                tokens_completion: enhancedMetrics?.tokensCompletion,
+                tokens_total: enhancedMetrics?.tokensTotal,
+                request_size: enhancedMetrics?.requestSize,
+                response_size: enhancedMetrics?.responseSize,
+                model_used: enhancedMetrics?.modelUsed,
+                provider_response_time: enhancedMetrics?.providerResponseTime
             });
         } catch (error) {
             console.error('Failed to log API call:', error);
