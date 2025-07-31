@@ -1,14 +1,18 @@
-const fs = require('fs');
-const path = require('path');
+import * as fs from 'fs';
+import * as path from 'path';
+import { ProviderConfig } from '../types';
 
 class ProviderConfigLoader {
+    private configPath: string;
+    private providers: Map<string, ProviderConfig>;
+
     constructor() {
         this.configPath = path.join(__dirname, '../../configs/providers');
         this.providers = new Map();
         this.loadProviders();
     }
 
-    loadProviders() {
+    private loadProviders(): void {
         try {
             if (!fs.existsSync(this.configPath)) {
                 console.error('Provider config directory not found:', this.configPath);
@@ -20,7 +24,7 @@ class ProviderConfigLoader {
             for (const file of files) {
                 try {
                     const filePath = path.join(this.configPath, file);
-                    const configData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                    const configData: ProviderConfig = JSON.parse(fs.readFileSync(filePath, 'utf8'));
                     
                     // Validate required fields
                     if (!this.validateProviderConfig(configData)) {
@@ -31,15 +35,15 @@ class ProviderConfigLoader {
                     this.providers.set(configData.provider, configData);
                     console.log(`Loaded provider config: ${configData.provider}`);
                 } catch (error) {
-                    console.error(`Error loading provider config ${file}:`, error.message);
+                    console.error(`Error loading provider config ${file}:`, (error as Error).message);
                 }
             }
         } catch (error) {
-            console.error('Error loading provider configs:', error.message);
+            console.error('Error loading provider configs:', (error as Error).message);
         }
     }
 
-    validateProviderConfig(config) {
+    private validateProviderConfig(config: any): config is ProviderConfig {
         const requiredFields = ['provider', 'name', 'base_url', 'auth_type'];
         const optionalFields = ['request_format', 'response_format'];
         
@@ -54,37 +58,37 @@ class ProviderConfigLoader {
         return hasRequiredFields && hasValidOptionalFields;
     }
 
-    getAllProviders() {
+    getAllProviders(): ProviderConfig[] {
         return Array.from(this.providers.values());
     }
 
-    getProvider(providerId) {
+    getProvider(providerId: string): ProviderConfig | undefined {
         return this.providers.get(providerId);
     }
 
-    getProviderNames() {
+    getProviderNames(): string[] {
         return Array.from(this.providers.keys());
     }
 
-    hasProvider(providerId) {
+    hasProvider(providerId: string): boolean {
         return this.providers.has(providerId);
     }
 
-    getFormatAdapters() {
-        const adapters = {};
+    getFormatAdapters(): Record<string, string | undefined> {
+        const adapters: Record<string, string | undefined> = {};
         for (const [providerId, config] of this.providers) {
             adapters[providerId] = config.request_format;
         }
         return adapters;
     }
 
-    buildHeaders(providerId, apiKey) {
+    buildHeaders(providerId: string, apiKey: string): Record<string, string> {
         const provider = this.getProvider(providerId);
         if (!provider || !provider.headers) {
             return {};
         }
 
-        const headers = {};
+        const headers: Record<string, string> = {};
         for (const [key, value] of Object.entries(provider.headers)) {
             headers[key] = value.replace('{{api_key}}', apiKey);
         }
@@ -92,10 +96,10 @@ class ProviderConfigLoader {
     }
 
     // Reload configs (useful for development/testing)
-    reload() {
+    reload(): void {
         this.providers.clear();
         this.loadProviders();
     }
 }
 
-module.exports = new ProviderConfigLoader();
+export default new ProviderConfigLoader();

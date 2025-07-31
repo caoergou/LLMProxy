@@ -1,9 +1,15 @@
-const axios = require('axios');
-const ApiKeyModel = require('../models/ApiKey');
-const ApiCallModel = require('../models/ApiCall');
-const ProviderConfigLoader = require('../utils/ProviderConfigLoader');
+import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import ApiKeyModel from '../models/ApiKey';
+import ApiCallModel from '../models/ApiCall';
+import ProviderConfigLoader from '../utils/ProviderConfigLoader';
+import { ApiKeyData, ProxyResult } from '../types';
+
+type FormatAdapterFunction = (data: any, direction: 'request' | 'response') => any;
 
 class ProxyService {
+    private formatAdapters: Record<string, FormatAdapterFunction>;
+    private providerConfig: typeof ProviderConfigLoader;
+
     constructor() {
         this.formatAdapters = {
             openai: this.adaptOpenAIFormat.bind(this),
@@ -13,11 +19,11 @@ class ProxyService {
         this.providerConfig = ProviderConfigLoader;
     }
 
-    async proxyRequest(provider, endpoint, method, data, headers = {}) {
+    async proxyRequest(provider: string, endpoint: string, method: string, data: any, headers: Record<string, string> = {}): Promise<ProxyResult> {
         const startTime = Date.now();
-        let selectedApiKey = null;
-        let response = null;
-        let error = null;
+        let selectedApiKey: ApiKeyData | null = null;
+        let response: AxiosResponse | null = null;
+        let error: Error | null = null;
 
         try {
             // Get optimal API key for provider
@@ -30,8 +36,8 @@ class ProxyService {
             const adaptedData = await this.adaptRequestFormat(provider, data);
             
             // Prepare request
-            const requestConfig = {
-                method: method.toLowerCase(),
+            const requestConfig: AxiosRequestConfig = {
+                method: method.toLowerCase() as any,
                 url: `${selectedApiKey.base_url}${endpoint}`,
                 data: adaptedData,
                 headers: this.buildHeaders(selectedApiKey, headers),
@@ -41,18 +47,22 @@ class ProxyService {
             // Make request
             response = await axios(requestConfig);
             
+            if (!response) {
+                throw new Error('No response received from API');
+            }
+            
             // Adapt response format
             const adaptedResponse = await this.adaptResponseFormat(provider, response.data);
             
             // Update quota if applicable
-            if (selectedApiKey.remaining_quota > 0) {
-                await ApiKeyModel.updateQuota(selectedApiKey.id, selectedApiKey.remaining_quota - 1);
-            } else {
+            if (selectedApiKey.remaining_quota !== undefined && selectedApiKey.remaining_quota > 0) {
+                await ApiKeyModel.updateQuota(selectedApiKey.id!, selectedApiKey.remaining_quota - 1);
+            } else if (selectedApiKey.remaining_quota !== undefined && selectedApiKey.remaining_quota !== -1) {
                 throw new Error(`Quota exhausted for API key: ${selectedApiKey.name}`);
             }
 
             // Log successful call
-            await this.logApiCall(selectedApiKey.id, endpoint, method, data, response.status, Date.now() - startTime, selectedApiKey.cost_per_request);
+            await this.logApiCall(selectedApiKey.id!, endpoint, method, data, response.status, Date.now() - startTime, selectedApiKey.cost_per_request || 0);
 
             return {
                 success: true,
@@ -64,17 +74,17 @@ class ProxyService {
             };
 
         } catch (err) {
-            error = err;
-            const responseStatus = err.response ? err.response.status : 500;
+            error = err as Error;
+            const responseStatus = (err as any).response ? (err as any).response.status : 500;
             
             // Log failed call
             if (selectedApiKey) {
-                await this.logApiCall(selectedApiKey.id, endpoint, method, data, responseStatus, Date.now() - startTime, 0);
+                await this.logApiCall(selectedApiKey?.id || 0, endpoint, method, data, responseStatus, Date.now() - startTime, 0);
             }
 
             return {
                 success: false,
-                error: err.message,
+                error: error.message,
                 status: responseStatus,
                 provider: provider,
                 api_key_name: selectedApiKey ? selectedApiKey.name : 'none',
@@ -83,7 +93,7 @@ class ProxyService {
         }
     }
 
-    async selectOptimalApiKey(provider) {
+    private async selectOptimalApiKey(provider: string): Promise<ApiKeyData | null> {
         const apiKeys = await ApiKeyModel.getActiveByProvider(provider);
         
         if (apiKeys.length === 0) {
@@ -96,19 +106,19 @@ class ProxyService {
         // 3. Lowest cost per request
         const unlimitedQuotaKeys = apiKeys.filter(key => key.remaining_quota === -1);
         if (unlimitedQuotaKeys.length > 0) {
-            return unlimitedQuotaKeys.sort((a, b) => a.cost_per_request - b.cost_per_request)[0];
+            return unlimitedQuotaKeys.sort((a, b) => (a.cost_per_request || 0) - (b.cost_per_request || 0))[0];
         }
 
         return apiKeys.sort((a, b) => {
-            if (a.remaining_quota !== b.remaining_quota) {
-               return b.remaining_quota - a.remaining_quota;
+            if ((a.remaining_quota || 0) !== (b.remaining_quota || 0)) {
+               return (b.remaining_quota || 0) - (a.remaining_quota || 0);
            }
-           return a.cost_per_request - b.cost_per_request;
+           return (a.cost_per_request || 0) - (b.cost_per_request || 0);
        })[0];
     }
 
-    buildHeaders(apiKey, additionalHeaders = {}) {
-        const headers = { ...additionalHeaders };
+    private buildHeaders(apiKey: ApiKeyData, additionalHeaders: Record<string, string> = {}): Record<string, string> {
+        const headers: Record<string, string> = { ...additionalHeaders };
         
         // Use provider config to build headers
         const providerConfig = this.providerConfig.getProvider(apiKey.provider);
@@ -133,33 +143,33 @@ class ProxyService {
         return headers;
     }
 
-    async adaptRequestFormat(provider, data) {
+    private async adaptRequestFormat(provider: string, data: any): Promise<any> {
         if (this.formatAdapters[provider]) {
             return this.formatAdapters[provider](data, 'request');
         }
         return data;
     }
 
-    async adaptResponseFormat(provider, data) {
+    private async adaptResponseFormat(provider: string, data: any): Promise<any> {
         if (this.formatAdapters[provider]) {
             return this.formatAdapters[provider](data, 'response');
         }
         return data;
     }
 
-    adaptOpenAIFormat(data, direction) {
+    private adaptOpenAIFormat(data: any, direction: 'request' | 'response'): any {
         // OpenAI is our standard format, no adaptation needed
         return data;
     }
 
-    adaptAnthropicFormat(data, direction) {
+    private adaptAnthropicFormat(data: any, direction: 'request' | 'response'): any {
         if (direction === 'request') {
             // Convert OpenAI format to Anthropic format
             if (data.messages) {
                 return {
                     model: data.model || 'claude-3-sonnet-20240229',
                     max_tokens: data.max_tokens || 1000,
-                    messages: data.messages.map(msg => ({
+                    messages: data.messages.map((msg: any) => ({
                         role: msg.role,
                         content: msg.content
                     }))
@@ -187,12 +197,12 @@ class ProxyService {
         return data;
     }
 
-    adaptAzureFormat(data, direction) {
+    private adaptAzureFormat(data: any, direction: 'request' | 'response'): any {
         // Azure uses OpenAI format, no adaptation needed
         return data;
     }
 
-    async logApiCall(apiKeyId, endpoint, method, requestData, responseStatus, responseTime, cost) {
+    private async logApiCall(apiKeyId: number, endpoint: string, method: string, requestData: any, responseStatus: number, responseTime: number, cost: number): Promise<void> {
         try {
             await ApiCallModel.create({
                 api_key_id: apiKeyId,
@@ -214,9 +224,9 @@ class ProxyService {
     }
 
     // Check if provider is supported
-    isProviderSupported(providerId) {
+    isProviderSupported(providerId: string): boolean {
         return this.providerConfig.hasProvider(providerId);
     }
 }
 
-module.exports = new ProxyService();
+export default new ProxyService();

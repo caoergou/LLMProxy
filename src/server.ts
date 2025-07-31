@@ -1,10 +1,10 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
-const Database = require('./models/Database');
-const apiRoutes = require('./routes/api');
-const webRoutes = require('./routes/web');
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import * as path from 'path';
+import Database from './models/Database';
+import apiRoutes from './routes/api';
+import webRoutes from './routes/web';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,4 +27,4 @@ app.listen(PORT, () => {
     console.log(`Web interface: http://localhost:${PORT}`);
 });
 
-module.exports = app;
+export default app;

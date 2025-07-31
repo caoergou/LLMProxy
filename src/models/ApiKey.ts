@@ -1,26 +1,37 @@
-const Database = require('../models/Database');
-const Encryption = require('../utils/Encryption');
+import Database from './Database';
+import Encryption from '../utils/Encryption';
+import { ApiKeyData } from '../types';
 
 class ApiKeyModel {
-    static getAll() {
+    static getAll(): Promise<ApiKeyData[]> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             db.all(`SELECT id, provider, name, base_url, cost_per_request, 
                     remaining_quota, total_quota, is_active, created_at, updated_at 
                     FROM api_keys ORDER BY created_at DESC`, [], (err, rows) => {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows as ApiKeyData[]);
                 }
             });
         });
     }
 
-    static getById(id) {
+    static getById(id: number): Promise<ApiKeyData | null> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
-            db.get(`SELECT * FROM api_keys WHERE id = ?`, [id], (err, row) => {
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
+            db.get(`SELECT * FROM api_keys WHERE id = ?`, [id], (err, row: any) => {
                 if (err) {
                     reject(err);
                 } else if (row) {
@@ -29,7 +40,7 @@ class ApiKeyModel {
                     if (row.api_secret) {
                         row.api_secret = Encryption.decrypt(row.api_secret);
                     }
-                    resolve(row);
+                    resolve(row as ApiKeyData);
                 } else {
                     resolve(null);
                 }
@@ -37,9 +48,14 @@ class ApiKeyModel {
         });
     }
 
-    static getActiveByProvider(provider) {
+    static getActiveByProvider(provider: string): Promise<ApiKeyData[]> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             db.all(`SELECT id, provider, name, cost_per_request, remaining_quota, 
                     is_active, created_at, updated_at 
                     FROM api_keys WHERE provider = ? AND is_active = 1 
@@ -47,26 +63,31 @@ class ApiKeyModel {
                         CASE WHEN remaining_quota = -1 THEN 1 ELSE 0 END DESC,
                         remaining_quota DESC,
                         cost_per_request ASC`, 
-                [provider], (err, rows) => {
+                [provider], (err, rows: any[]) => {
                 if (err) {
                     reject(err);
                 } else {
                     // Decrypt sensitive data
-                    rows.forEach(row => {
+                    const decryptedRows = rows.map(row => {
                         row.api_key = Encryption.decrypt(row.api_key);
                         if (row.api_secret) {
                             row.api_secret = Encryption.decrypt(row.api_secret);
                         }
+                        return row;
                     });
-                    resolve(rows);
+                    resolve(decryptedRows as ApiKeyData[]);
                 }
             });
         });
     }
 
-    static create(keyData) {
+    static create(keyData: Omit<ApiKeyData, 'id' | 'created_at' | 'updated_at'>): Promise<ApiKeyData> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
             
             // Encrypt sensitive data
             const encryptedApiKey = Encryption.encrypt(keyData.api_key);
@@ -84,19 +105,23 @@ class ApiKeyModel {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve({ id: this.lastID, ...keyData });
+                        resolve({ id: this.lastID, ...keyData } as ApiKeyData);
                     }
                 }
             );
         });
     }
 
-    static update(id, keyData) {
+    static update(id: number, keyData: Partial<ApiKeyData>): Promise<{ changes: number }> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
             
-            let updateFields = [];
-            let updateValues = [];
+            const updateFields: string[] = [];
+            const updateValues: any[] = [];
 
             if (keyData.name !== undefined) {
                 updateFields.push('name = ?');
@@ -147,9 +172,14 @@ class ApiKeyModel {
         });
     }
 
-    static delete(id) {
+    static delete(id: number): Promise<{ changes: number }> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             db.run(`DELETE FROM api_keys WHERE id = ?`, [id], function(err) {
                 if (err) {
                     reject(err);
@@ -160,9 +190,14 @@ class ApiKeyModel {
         });
     }
 
-    static updateQuota(id, remainingQuota) {
+    static updateQuota(id: number, remainingQuota: number): Promise<{ changes: number }> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             db.run(`UPDATE api_keys SET remaining_quota = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
                 [remainingQuota, id],
                 function(err) {
@@ -177,4 +212,4 @@ class ApiKeyModel {
     }
 }
 
-module.exports = ApiKeyModel;
+export default ApiKeyModel;

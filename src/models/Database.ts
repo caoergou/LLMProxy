@@ -1,15 +1,13 @@
-const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
-const ProviderConfigLoader = require('../utils/ProviderConfigLoader');
+import { Database as SQLiteDatabase } from 'sqlite3';
+import * as path from 'path';
+import ProviderConfigLoader from '../utils/ProviderConfigLoader';
 
 class Database {
-    constructor() {
-        this.db = null;
-    }
+    private db: SQLiteDatabase | null = null;
 
-    init() {
+    init(): void {
         const dbPath = path.join(__dirname, '../../data/api_proxy.db');
-        this.db = new sqlite3.Database(dbPath, (err) => {
+        this.db = new SQLiteDatabase(dbPath, (err) => {
             if (err) {
                 console.error('Error opening database:', err.message);
             } else {
@@ -19,10 +17,12 @@ class Database {
         });
     }
 
-    createTables() {
+    private createTables(): void {
+        if (!this.db) return;
+        
         // API Keys table
         this.db.serialize(() => {
-            this.db.run(`CREATE TABLE IF NOT EXISTS api_keys (
+            this.db!.run(`CREATE TABLE IF NOT EXISTS api_keys (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 provider TEXT NOT NULL,
                 name TEXT NOT NULL,
@@ -38,7 +38,7 @@ class Database {
             )`);
 
             // API Calls table for tracking usage
-            this.db.run(`CREATE TABLE IF NOT EXISTS api_calls (
+            this.db!.run(`CREATE TABLE IF NOT EXISTS api_calls (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 api_key_id INTEGER,
                 endpoint TEXT NOT NULL,
@@ -52,7 +52,7 @@ class Database {
             )`);
 
             // Provider Templates table
-            this.db.run(`CREATE TABLE IF NOT EXISTS provider_templates (
+            this.db!.run(`CREATE TABLE IF NOT EXISTS provider_templates (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 provider TEXT UNIQUE NOT NULL,
                 name TEXT NOT NULL,
@@ -73,7 +73,9 @@ class Database {
         });
     }
 
-    seedProviderTemplates() {
+    private seedProviderTemplates(): void {
+        if (!this.db) return;
+        
         // Load providers from configuration files
         const providers = ProviderConfigLoader.getAllProviders().map(config => ({
             provider: config.provider,
@@ -87,7 +89,7 @@ class Database {
         }));
 
         providers.forEach(provider => {
-            this.db.run(`INSERT OR IGNORE INTO provider_templates 
+            this.db!.run(`INSERT OR IGNORE INTO provider_templates 
                 (provider, name, base_url, auth_type, request_format, response_format, cost_per_request, endpoints)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
                 [provider.provider, provider.name, provider.base_url, provider.auth_type, 
@@ -101,15 +103,15 @@ class Database {
         });
     }
 
-    getDb() {
+    getDb(): SQLiteDatabase | null {
         return this.db;
     }
 
-    close() {
+    close(): void {
         if (this.db) {
             this.db.close();
         }
     }
 }
 
-module.exports = new Database();
+export default new Database();

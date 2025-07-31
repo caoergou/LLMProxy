@@ -1,9 +1,15 @@
-const Database = require('../models/Database');
+import Database from './Database';
+import { ApiCallData, ApiStats, RecentCall, EndpointUsage, TimeRange } from '../types';
 
 class ApiCallModel {
-    static create(callData) {
+    static create(callData: Omit<ApiCallData, 'id' | 'created_at'>): Promise<ApiCallData> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             db.run(`INSERT INTO api_calls 
                     (api_key_id, endpoint, method, request_data, response_status, response_time, cost)
                     VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -14,16 +20,21 @@ class ApiCallModel {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve({ id: this.lastID, ...callData });
+                        resolve({ id: this.lastID, ...callData } as ApiCallData);
                     }
                 }
             );
         });
     }
 
-    static getStats(timeRange = '24h') {
+    static getStats(timeRange: TimeRange = '24h'): Promise<ApiStats[]> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             let timeFilter = '';
             
             switch(timeRange) {
@@ -59,15 +70,20 @@ class ApiCallModel {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows as ApiStats[]);
                 }
             });
         });
     }
 
-    static getRecentCalls(limit = 50) {
+    static getRecentCalls(limit: number = 50): Promise<RecentCall[]> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             db.all(`SELECT 
                         ac.*,
                         ak.provider,
@@ -79,15 +95,20 @@ class ApiCallModel {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows as RecentCall[]);
                 }
             });
         });
     }
 
-    static getUsageByEndpoint(timeRange = '24h') {
+    static getUsageByEndpoint(timeRange: TimeRange = '24h'): Promise<EndpointUsage[]> {
         return new Promise((resolve, reject) => {
             const db = Database.getDb();
+            if (!db) {
+                reject(new Error('Database not initialized'));
+                return;
+            }
+            
             let timeFilter = '';
             
             switch(timeRange) {
@@ -120,11 +141,11 @@ class ApiCallModel {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve(rows);
+                    resolve(rows as EndpointUsage[]);
                 }
             });
         });
     }
 }
 
-module.exports = ApiCallModel;
+export default ApiCallModel;
