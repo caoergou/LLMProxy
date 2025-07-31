@@ -1,0 +1,39 @@
+{
+  "provider": "anthropic",
+  "name": "Anthropic Claude",
+  "display_name": "Anthropic Claude",
+  "description": "Anthropic's Claude AI models, known for safety and reasoning",
+  "base_url": "https://api.anthropic.com",
+  "auth_type": "header",
+  "request_format": "anthropic",
+  "response_format": "anthropic",
+  "cost_per_request": 0.003,
+  "endpoints": [
+    "/v1/messages"
+  ],
+  "models": [
+    {
+      "name": "claude-3-opus-20240229",
+      "display_name": "Claude 3 Opus",
+      "description": "Most powerful model for complex tasks"
+    },
+    {
+      "name": "claude-3-sonnet-20240229",
+      "display_name": "Claude 3 Sonnet",
+      "description": "Balanced performance and speed"
+    },
+    {
+      "name": "claude-3-haiku-20240307",
+      "display_name": "Claude 3 Haiku",
+      "description": "Fast and efficient for simple tasks"
+    }
+  ],
+  "headers": {
+    "x-api-key": "{{api_key}}",
+    "Content-Type": "application/json",
+    "anthropic-version": "2023-06-01"
+  },
+  "icon": "🧠",
+  "website": "https://anthropic.com",
+  "documentation": "https://docs.anthropic.com/"
+}

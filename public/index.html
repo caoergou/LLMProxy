@@ -402,10 +402,8 @@
                 <div class="form-group">
                     <label data-i18n="modal.provider">提供商</label>
                     <select id="provider" onchange="updateProviderFields()" required>
-                        <option value="" data-i18n="modal.select_provider">选择提供商</option>
-                        <option value="openai">OpenAI</option>
-                        <option value="anthropic">Anthropic Claude</option>
-                        <option value="azure">Azure OpenAI</option>
+                        <option value="">选择提供商</option>
+                        <!-- Options will be loaded dynamically -->
                     </select>
                 </div>
                 
@@ -464,6 +462,7 @@
         // Global state
         let apiKeys = [];
         let currentEditingKey = null;
+        let supportedProviders = [];
 
         // Language change function
         function changeLanguage(lang) {
@@ -489,7 +488,7 @@
             
             // Apply initial translations
             i18n.updateDOM();
-            
+            loadSupportedProviders();
             loadStats();
             loadApiKeys();
             loadRecentCalls();
@@ -703,6 +702,39 @@
             });
         }
 
+        // Load supported providers
+        async function loadSupportedProviders() {
+            try {
+                const response = await fetch('/api/provider-configs');
+                const result = await response.json();
+                
+                if (result.success) {
+                    supportedProviders = result.data;
+                    updateProviderSelect();
+                } else {
+                    console.error('Failed to load providers:', result.error);
+                }
+            } catch (error) {
+                console.error('Failed to load providers:', error.message);
+            }
+        }
+
+        function updateProviderSelect() {
+            const providerSelect = document.getElementById('provider');
+            if (!providerSelect) return;
+
+            // Clear existing options except the first one
+            providerSelect.innerHTML = '<option value="">选择提供商</option>';
+            
+            // Add providers from configuration
+            supportedProviders.forEach(provider => {
+                const option = document.createElement('option');
+                option.value = provider.provider;
+                option.textContent = `${provider.icon} ${provider.display_name}`;
+                providerSelect.appendChild(option);
+            });
+        }
+
         // Modal functions
         function showAddKeyModal() {
             document.getElementById('modalTitle').textContent = i18n.t('modal.add_key');
@@ -741,19 +773,27 @@
             const baseUrlField = document.getElementById('baseUrl');
             const costField = document.getElementById('costPerRequest');
             
-            switch(provider) {
-                case 'openai':
-                    baseUrlField.value = 'https://api.openai.com/v1';
-                    costField.value = '0.002';
-                    break;
-                case 'anthropic':
-                    baseUrlField.value = 'https://api.anthropic.com';
-                    costField.value = '0.003';
-                    break;
-                case 'azure':
-                    baseUrlField.value = 'https://your-resource.openai.azure.com';
-                    costField.value = '0.002';
-                    break;
+            // Find provider config
+            const providerConfig = supportedProviders.find(p => p.provider === provider);
+            if (providerConfig) {
+                baseUrlField.value = providerConfig.base_url;
+                costField.value = providerConfig.cost_per_request;
+            } else {
+                // Fallback to hardcoded values for backward compatibility
+                switch(provider) {
+                    case 'openai':
+                        baseUrlField.value = 'https://api.openai.com/v1';
+                        costField.value = '0.002';
+                        break;
+                    case 'anthropic':
+                        baseUrlField.value = 'https://api.anthropic.com';
+                        costField.value = '0.003';
+                        break;
+                    case 'azure':
+                        baseUrlField.value = 'https://your-resource.openai.azure.com';
+                        costField.value = '0.002';
+                        break;
+                }
             }
         }
 

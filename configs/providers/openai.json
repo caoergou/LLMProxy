@@ -1,0 +1,40 @@
+{
+  "provider": "openai",
+  "name": "OpenAI",
+  "display_name": "OpenAI GPT",
+  "description": "OpenAI's GPT models including GPT-4, GPT-3.5-turbo",
+  "base_url": "https://api.openai.com/v1",
+  "auth_type": "bearer",
+  "request_format": "openai",
+  "response_format": "openai",
+  "cost_per_request": 0.002,
+  "endpoints": [
+    "/chat/completions",
+    "/completions",
+    "/embeddings"
+  ],
+  "models": [
+    {
+      "name": "gpt-4",
+      "display_name": "GPT-4",
+      "description": "Most capable model, best for complex tasks"
+    },
+    {
+      "name": "gpt-4-turbo",
+      "display_name": "GPT-4 Turbo",
+      "description": "Faster and more efficient version of GPT-4"
+    },
+    {
+      "name": "gpt-3.5-turbo",
+      "display_name": "GPT-3.5 Turbo",
+      "description": "Fast and efficient model for most tasks"
+    }
+  ],
+  "headers": {
+    "Authorization": "Bearer {{api_key}}",
+    "Content-Type": "application/json"
+  },
+  "icon": "🤖",
+  "website": "https://openai.com",
+  "documentation": "https://platform.openai.com/docs"
+}

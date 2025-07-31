@@ -28,16 +28,16 @@ class ApiCallModel {
             
             switch(timeRange) {
                 case '1h':
-                    timeFilter = "datetime(created_at) >= datetime('now', '-1 hour')";
+                    timeFilter = "datetime(ac.created_at) >= datetime('now', '-1 hour')";
                     break;
                 case '24h':
-                    timeFilter = "datetime(created_at) >= datetime('now', '-1 day')";
+                    timeFilter = "datetime(ac.created_at) >= datetime('now', '-1 day')";
                     break;
                 case '7d':
-                    timeFilter = "datetime(created_at) >= datetime('now', '-7 days')";
+                    timeFilter = "datetime(ac.created_at) >= datetime('now', '-7 days')";
                     break;
                 case '30d':
-                    timeFilter = "datetime(created_at) >= datetime('now', '-30 days')";
+                    timeFilter = "datetime(ac.created_at) >= datetime('now', '-30 days')";
                     break;
                 default:
                     timeFilter = "1=1";

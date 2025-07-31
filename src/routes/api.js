@@ -4,6 +4,7 @@ const ApiKeyModel = require('../models/ApiKey');
 const ApiCallModel = require('../models/ApiCall');
 const ProxyService = require('../services/ProxyService');
 const Database = require('../models/Database');
+const ProviderConfigLoader = require('../utils/ProviderConfigLoader');
 
 // API Keys management
 router.get('/keys', async (req, res) => {
@@ -42,17 +43,31 @@ router.delete('/keys/:id', async (req, res) => {
     }
 });
 
-// Provider templates
+// Provider templates - updated to use config loader
 router.get('/providers', async (req, res) => {
     try {
-        const db = Database.getDb();
-        db.all('SELECT * FROM provider_templates ORDER BY name', [], (err, rows) => {
-            if (err) {
-                res.status(500).json({ success: false, error: err.message });
-            } else {
-                res.json({ success: true, data: rows });
-            }
-        });
+        const providers = ProviderConfigLoader.getAllProviders();
+        res.json({ success: true, data: providers });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get provider configurations for frontend
+router.get('/provider-configs', async (req, res) => {
+    try {
+        const providers = ProviderConfigLoader.getAllProviders();
+        // Return only necessary info for frontend
+        const frontendProviders = providers.map(provider => ({
+            provider: provider.provider,
+            name: provider.name,
+            display_name: provider.display_name,
+            base_url: provider.base_url,
+            cost_per_request: provider.cost_per_request,
+            models: provider.models || [],
+            icon: provider.icon || '🤖'
+        }));
+        res.json({ success: true, data: frontendProviders });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
