@@ -4,13 +4,15 @@
 
 ## 🚀 特性
 
-- **统一接口**: 提供标准化的 API 接口，支持多种 AI 服务提供商
-- **智能路由**: 自动选择最优 API 密钥（基于成本、额度、响应时间）
-- **格式转换**: 自动适配不同厂商的请求/响应格式
-- **加密存储**: 本地加密存储 API 密钥，确保安全性
-- **实时监控**: 跟踪 API 调用统计、成本和性能
-- **Web 管理界面**: 直观的可视化管理面板
-- **轻量部署**: 单一服务，易于部署和配置
+- **🎯 统一 OpenAI 规范接口**: 完全兼容 OpenAI API，支持使用官方客户端库
+- **🔄 智能提供商选择**: 自动选择最优 API 密钥（基于成本、额度、响应时间）
+- **🗺️ 透明模型映射**: 自动将 OpenAI 模型映射到不同提供商的对应模型
+- **📊 格式转换**: 自动适配不同厂商的请求/响应格式到 OpenAI 标准
+- **🔒 加密存储**: 本地加密存储 API 密钥，确保安全性
+- **📈 实时监控**: 跟踪 API 调用统计、成本和性能
+- **🖥️ Web 管理界面**: 直观的可视化管理面板
+- **⚡ 轻量部署**: 单一服务，易于部署和配置
+- **🔄 向后兼容**: 完全支持现有集成，零破坏性更改
 
 ## 🎯 支持的 AI 服务商
 
@@ -96,9 +98,79 @@ npm start
 
 ## 🔧 使用说明
 
-### API 接口
+### 🌟 统一 OpenAI 规范接口（推荐）
 
-#### 1. 统一聊天接口
+项目现在提供完全兼容 OpenAI API 的统一接口，支持使用标准 OpenAI 客户端库：
+
+#### 1. 主要聊天完成接口
+
+```bash
+POST http://localhost:3000/api/v1/chat/completions
+Content-Type: application/json
+
+{
+  "model": "gpt-3.5-turbo",
+  "messages": [
+    {"role": "user", "content": "Hello, world!"}
+  ],
+  "max_tokens": 150,
+  "temperature": 0.7
+}
+```
+
+**优势：**
+- 🎯 **完全 OpenAI 兼容** - 可直接使用官方 OpenAI 客户端库
+- 🔄 **智能提供商选择** - 自动选择最优可用提供商
+- 🗺️ **模型映射** - 透明地将 OpenAI 模型映射到不同提供商
+- ✅ **标准化错误处理** - 统一的错误响应格式
+
+#### 2. 使用 OpenAI 客户端库
+
+**JavaScript/Node.js:**
+```javascript
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: 'dummy-key', // API Proxy 不需要真实密钥
+  baseURL: 'http://localhost:3000/api/v1'
+});
+
+const completion = await openai.chat.completions.create({
+  messages: [{ role: 'user', content: 'Say hello in Chinese' }],
+  model: 'gpt-3.5-turbo',
+});
+```
+
+**Python:**
+```python
+import openai
+
+openai.api_key = "dummy-key"
+openai.api_base = "http://localhost:3000/api/v1"
+
+response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": "你好"}]
+)
+```
+
+#### 3. 可用模型列表
+
+```bash
+GET http://localhost:3000/api/v1/models
+```
+
+#### 4. 详细提供商信息
+
+```bash
+GET http://localhost:3000/api/providers/capabilities
+```
+
+**查看完整文档：** [OpenAI 统一规范接口指南](docs/UNIFIED_API.md)
+
+### 🔧 传统接口（向后兼容）
+
+#### 1. 传统聊天接口
 
 ```bash
 POST http://localhost:3000/api/chat/completions?provider=openai
