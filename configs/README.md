@@ -1,28 +1,27 @@
-# Provider Configurations
+# 提供商配置
 
-This directory contains configuration files for AI service providers supported by the API Proxy.
+这个目录包含了 API Proxy 支持的 AI 服务提供商配置文件。
 
-## Directory Structure
+## 目录结构
 
 ```
-configs/
-└── providers/
-    ├── openai.json      # OpenAI configuration
-    ├── anthropic.json   # Anthropic configuration
-    ├── azure.json       # Azure OpenAI configuration
-    └── ...              # Additional provider configurations
+configs/providers/
+├── openai.json      # OpenAI 配置
+├── anthropic.json   # Anthropic 配置
+├── azure.json       # Azure OpenAI 配置
+└── ...              # 其他提供商配置
 ```
 
-## Configuration Format
+## 配置格式
 
-Each provider configuration file should follow this JSON schema:
+每个提供商配置文件应遵循以下 JSON 格式：
 
 ```json
 {
-  "provider": "unique_provider_id",
-  "name": "Provider Name",
-  "display_name": "Display Name in UI",
-  "description": "Brief description",
+  "provider": "provider_id",
+  "name": "Provider Name", 
+  "display_name": "显示名称",
+  "description": "简短描述",
   "base_url": "https://api.provider.com",
   "auth_type": "bearer|header|api-key",
   "request_format": "openai|custom",
@@ -32,8 +31,8 @@ Each provider configuration file should follow this JSON schema:
   "models": [
     {
       "name": "model-name",
-      "display_name": "Model Display Name",
-      "description": "Model description"
+      "display_name": "模型显示名称", 
+      "description": "模型描述"
     }
   ],
   "headers": {
@@ -42,24 +41,23 @@ Each provider configuration file should follow this JSON schema:
   },
   "icon": "🤖",
   "website": "https://provider.com",
-  "documentation": "https://docs.provider.com"
+  "documentation": "https://docs.provider.com",
+  "registration_guide": "注册指南",
+  "notes": "使用说明"
 }
 ```
 
-## Adding New Providers
+## 添加新提供商
 
-To add a new provider:
+1. 在此目录创建新的 JSON 配置文件
+2. 遵循上述格式要求
+3. 如需要，在代码中添加格式适配器
+4. 重启服务器加载配置
 
-1. Create a new JSON file in this directory with the provider ID as filename
-2. Follow the configuration schema above
-3. Add format adapters in `src/services/ProxyService.js` if needed (for non-OpenAI compatible APIs)
-4. Test the configuration by restarting the server
+详细说明请查看 [贡献指南](../../CONTRIBUTING.md)。
 
-For detailed instructions, see [CONTRIBUTING.md](../../CONTRIBUTING.md).
+## 注意事项
 
-## Notes
-
-- The `{{api_key}}` placeholder in headers will be replaced with the actual API key
-- Icons should be emoji characters for consistent display
-- All configurations are loaded automatically on server startup
-- Changes require a server restart to take effect
+- `{{api_key}}` 占位符会被实际 API 密钥替换
+- 图标使用 emoji 字符
+- 配置更改需要重启服务器生效

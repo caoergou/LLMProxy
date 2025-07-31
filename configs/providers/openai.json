@@ -39,7 +39,6 @@
   "website": "https://openai.com",
   "documentation": "https://platform.openai.com/docs",
   "console_url": "https://platform.openai.com/playground",
-  "registration_guide": "## 如何注册 OpenAI API\n\n1. 访问 [OpenAI Platform](https://platform.openai.com)\n2. 点击 \"Sign up\" 注册账户\n3. 验证邮箱并完成账户设置\n4. 进入 [API Keys](https://platform.openai.com/api-keys) 页面\n5. 点击 \"Create new secret key\" 创建 API 密钥\n6. 复制并保存您的 API 密钥（仅显示一次）\n\n**注意：** 首次注册会获得免费额度，用完后需要绑定付费方式。",
-  "promotions": "## 最新优惠信息\n\n- 🎉 **新用户福利**：注册即获得 $5 免费额度\n- 🔥 **ChatGPT Plus**：月费 $20，享受 GPT-4 优先访问\n- 📚 **学术用户**：符合条件的研究者可申请学术折扣\n- 💰 **企业套餐**：大量使用可联系销售获取优惠价格\n\n访问 [定价页面](https://openai.com/pricing) 了解最新价格信息。",
-  "additional_info": "## 使用提示\n\n### API 限制\n- **速率限制**：免费用户每分钟 3 次请求，付费用户可达 3500 次\n- **上下文长度**：GPT-3.5-turbo 支持 16K tokens，GPT-4 支持 8K-128K tokens\n- **地区限制**：某些地区可能无法访问，建议使用代理\n\n### 最佳实践\n- 使用 System Message 设定 AI 角色和行为\n- 合理控制 max_tokens 参数以节省成本\n- 启用 stream 模式获得更好的用户体验\n- 妥善保管 API 密钥，避免泄露\n\n### 支持渠道\n- [帮助中心](https://help.openai.com)\n- [社区论坛](https://community.openai.com)\n- [官方博客](https://openai.com/blog)"
+  "registration_guide": "访问 [OpenAI Platform](https://platform.openai.com) 注册账户，在 API Keys 页面创建密钥。新用户获得免费额度。",
+  "notes": "支持 GPT-4、GPT-3.5-turbo 等模型。付费用户享有更高的速率限制。详见 [OpenAI 定价](https://openai.com/pricing)。"
 }

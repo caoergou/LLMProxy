@@ -57,33 +57,7 @@ router.get('/providers', async (req: Request, res: Response) => {
     }
 });
 
-// Get provider configurations for frontend (backward compatibility)
-router.get('/provider-configs', async (req: Request, res: Response) => {
-    try {
-        const providers = ProviderConfigLoader.getAllProviders();
-        // Return enhanced info for frontend including new fields
-        const frontendProviders = providers.map(provider => ({
-            provider: provider.provider,
-            name: provider.name,
-            display_name: provider.display_name,
-            description: provider.description,
-            base_url: provider.base_url,
-            cost_per_request: provider.cost_per_request,
-            models: provider.models || [],
-            icon: provider.icon || '🤖',
-            real_icon_url: provider.real_icon_url,
-            website: provider.website,
-            documentation: provider.documentation,
-            console_url: provider.console_url,
-            registration_guide: provider.registration_guide,
-            promotions: provider.promotions,
-            additional_info: provider.additional_info
-        }));
-        res.json({ success: true, data: frontendProviders });
-    } catch (error) {
-        res.status(500).json({ success: false, error: (error as Error).message });
-    }
-});
+
 
 // Get provider capabilities and supported models
 router.get('/providers/capabilities', async (req: Request, res: Response) => {
@@ -120,30 +94,7 @@ router.get('/providers/capabilities', async (req: Request, res: Response) => {
     }
 });
 
-// Legacy proxy endpoint - maintained for backward compatibility
-router.use('/proxy/:provider', async (req: Request, res: Response) => {
-    try {
-        const provider = req.params.provider;
-        const endpoint = req.path.replace(`/proxy/${provider}`, ''); // Extract the path after /proxy/:provider
-        const method = req.method;
-        const data = req.body;
-        const headers = req.headers as Record<string, string>;
 
-        const result = await ProxyService.proxyRequest(provider, endpoint, method, data, headers);
-        
-        if (result.success) {
-            res.json(result.data);
-        } else {
-            res.status(result.status || 500).json({ 
-                error: result.error,
-                provider: result.provider,
-                api_key_name: result.api_key_name
-            });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: (error as Error).message });
-    }
-});
 
 // ========================================
 // OpenAI-Compliant Unified Endpoints
@@ -192,48 +143,7 @@ router.post('/v1/chat/completions', async (req: Request, res: Response) => {
     }
 });
 
-// Alternative endpoint for backward compatibility with streaming support
-router.post('/chat/completions', async (req: Request, res: Response) => {
-    try {
-        const openaiRequest = req.body;
-        const preferredProvider = req.query.provider as string;
-        
-        // Check if streaming is requested
-        if (openaiRequest.stream) {
-            const result = await OpenAIUnifiedService.chatCompletionsStream(openaiRequest, res, {
-                preferredProvider
-            });
-            
-            if (!result.success && result.error) {
-                if (!res.headersSent) {
-                    const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
-                    res.status(status).json(result.error);
-                }
-            }
-            // For streaming, response is handled in the service method
-        } else {
-            const result = await OpenAIUnifiedService.chatCompletions(openaiRequest, {
-                preferredProvider
-            });
-            
-            if (result.success) {
-                res.json(result.data);
-            } else {
-                const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
-                res.status(status).json(result.error);
-            }
-        }
-    } catch (error) {
-        if (!res.headersSent) {
-            res.status(500).json({
-                error: {
-                    message: (error as Error).message,
-                    type: 'server_error'
-                }
-            });
-        }
-    }
-});
+
 
 // Get available models - OpenAI compatible
 router.get('/v1/models', async (req: Request, res: Response) => {
@@ -260,30 +170,7 @@ router.get('/v1/models', async (req: Request, res: Response) => {
     }
 });
 
-// Alternative endpoint for backward compatibility
-router.get('/models', async (req: Request, res: Response) => {
-    try {
-        const result = await OpenAIUnifiedService.getModels();
-        
-        if (result.success) {
-            res.json(result.data);
-        } else {
-            res.status(500).json({
-                error: {
-                    message: result.error,
-                    type: 'server_error'
-                }
-            });
-        }
-    } catch (error) {
-        res.status(500).json({
-            error: {
-                message: (error as Error).message,
-                type: 'server_error'
-            }
-        });
-    }
-});
+
 
 // Get specific model information - OpenAI compatible
 router.get('/v1/models/:model', async (req: Request, res: Response) => {
