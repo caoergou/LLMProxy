@@ -663,7 +663,7 @@
             <div class="stats-grid" id="statsGrid">
                 <div class="loading" data-i18n="dashboard.loading_stats">加载统计数据中...</div>
             </div>
-            
+
             <!-- Charts Section -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
@@ -675,7 +675,7 @@
                     <div id="tokenUsageChart">暂无数据</div>
                 </div>
             </div>
-            
+
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                     <h4 style="margin-bottom: 15px;" data-i18n="dashboard.performance_metrics">性能指标</h4>
@@ -686,7 +686,7 @@
                     <div id="costChart">暂无数据</div>
                 </div>
             </div>
-            
+
             <h3 style="margin-bottom: 15px;" data-i18n="dashboard.recent_calls">最近调用</h3>
             <div id="recentCalls">
                 <div class="loading" data-i18n="dashboard.loading_calls">加载最近调用记录中...</div>
@@ -702,7 +702,7 @@
                     <button class="btn btn-secondary" onclick="refreshModels()" data-i18n="models.refresh">刷新</button>
                 </div>
             </div>
-            
+
             <!-- Filter Section -->
             <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
                 <h4 style="margin-bottom: 10px;" data-i18n="models.filters">筛选条件</h4>
@@ -736,7 +736,7 @@
                     <button class="btn btn-secondary" onclick="clearModelFilters()" style="font-size: 12px; padding: 6px 12px;" data-i18n="models.clear_filters">清除筛选</button>
                 </div>
             </div>
-            
+
             <div id="modelsContainer">
                 <div class="loading" data-i18n="models.loading">加载模型信息中...</div>
             </div>
@@ -756,7 +756,7 @@
                 <h3 data-i18n="keys.title">API 密钥管理</h3>
                 <button class="btn" onclick="showAddKeyModal()" data-i18n="keys.add">添加密钥</button>
             </div>
-            
+
             <div id="apiKeysTable">
                 <div class="loading" data-i18n="keys.loading">加载 API 密钥中...</div>
             </div>
@@ -773,7 +773,7 @@
                     <option value="30d" data-i18n="logs.time_range.30d">最近 30 天</option>
                 </select>
             </div>
-            
+
             <div id="callsTable">
                 <div class="loading" data-i18n="logs.loading">加载调用日志中...</div>
             </div>
@@ -782,7 +782,7 @@
         <!-- Settings Tab -->
         <div id="settings" class="tab-content">
             <h3 style="margin-bottom: 20px;" data-i18n="settings.title">系统设置</h3>
-            
+
             <div class="form-group">
                 <label data-i18n="settings.language">语言</label>
                 <select id="settingsLanguageSelect" onchange="changeLanguage(this.value)">
@@ -790,19 +790,19 @@
                     <option value="en" data-i18n="lang.english">English</option>
                 </select>
             </div>
-            
+
             <div class="form-group">
                 <label data-i18n="settings.server_port">服务端口</label>
                 <input type="number" id="serverPort" value="3000" readonly>
                 <small style="color: #6b7280;" data-i18n="settings.server_port_note">重启服务生效</small>
             </div>
-            
+
             <div class="form-group">
                 <label data-i18n="settings.encryption_key">加密密钥</label>
                 <input type="password" id="encryptionKey" data-i18n-placeholder="settings.encryption_key_placeholder" placeholder="用于加密存储的密钥">
                 <small style="color: #6b7280;" data-i18n="settings.encryption_key_note">修改后需要重新配置所有 API 密钥</small>
             </div>
-            
+
             <div class="form-group">
                 <h4 style="margin-bottom: 10px;" data-i18n="settings.usage_title">使用说明</h4>
                 <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; line-height: 1.6;">
@@ -825,10 +825,10 @@
                 <h3 id="modalTitle" data-i18n="modal.add_key">添加 API 密钥</h3>
                 <button class="close" onclick="closeKeyModal()">&times;</button>
             </div>
-            
+
             <form id="keyForm">
                 <input type="hidden" id="keyId">
-                
+
                 <div class="form-group">
                     <label data-i18n="modal.provider">提供商</label>
                     <select id="provider" onchange="updateProviderFields()" required>
@@ -836,49 +836,49 @@
                         <!-- Options will be loaded dynamically -->
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label data-i18n="modal.key_name">名称</label>
                     <input type="text" id="keyName" required data-i18n-placeholder="modal.key_name_placeholder" placeholder="为此密钥命名">
                 </div>
-                
+
                 <div class="form-group">
                     <label data-i18n="modal.api_key">API 密钥</label>
                     <input type="password" id="apiKey" required data-i18n-placeholder="modal.api_key_placeholder" placeholder="输入 API 密钥">
                 </div>
-                
+
                 <div class="form-group" id="apiSecretGroup" style="display: none;">
                     <label data-i18n="modal.api_secret">API Secret</label>
                     <input type="password" id="apiSecret" data-i18n-placeholder="modal.api_secret_placeholder" placeholder="输入 API Secret（如需要）">
                 </div>
-                
+
                 <div class="form-group">
                     <label data-i18n="modal.base_url">基础 URL</label>
                     <input type="url" id="baseUrl" required data-i18n-placeholder="modal.base_url_placeholder" placeholder="API 基础地址">
                 </div>
-                
+
                 <div class="form-group">
                     <label data-i18n="modal.cost_per_request">每次调用成本</label>
                     <input type="number" id="costPerRequest" step="0.0001" value="0" placeholder="0.002">
                 </div>
-                
+
                 <div class="form-group">
                     <label data-i18n="modal.remaining_quota">剩余额度</label>
                     <input type="number" id="remainingQuota" value="-1" data-i18n-placeholder="modal.remaining_quota_placeholder" placeholder="-1 表示无限制">
                 </div>
-                
+
                 <div class="form-group">
                     <label data-i18n="modal.total_quota">总额度</label>
                     <input type="number" id="totalQuota" value="-1" data-i18n-placeholder="modal.total_quota_placeholder" placeholder="-1 表示无限制">
                 </div>
-                
+
                 <div class="form-group">
                     <div class="checkbox-group">
                         <input type="checkbox" id="isActive" checked>
                         <label for="isActive" data-i18n="modal.enable_key">启用此密钥</label>
                     </div>
                 </div>
-                
+
                 <div style="display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;">
                     <button type="button" class="btn btn-secondary" onclick="closeKeyModal()" data-i18n="modal.cancel">取消</button>
                     <button type="submit" class="btn" data-i18n="modal.save">保存</button>
@@ -894,21 +894,43 @@
         let apiKeys = [];
         let currentEditingKey = null;
         let supportedProviders = [];
-        
+
         // Chart instances
         let hourlyRequestsChart = null;
         let tokenUsageChart = null;
         let performanceChart = null;
         let costChart = null;
 
+        // Security utility functions
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function sanitizeUrl(url) {
+            if (!url) return '';
+            // Basic URL validation - only allow http/https
+            try {
+                const urlObj = new URL(url);
+                if (urlObj.protocol === 'http:' || urlObj.protocol === 'https:') {
+                    return url;
+                }
+            } catch (e) {
+                // Invalid URL
+            }
+            return '#';
+        }
+
         // Language change function
         function changeLanguage(lang) {
             i18n.setLanguage(lang);
-            
+
             // Update language selectors
             document.getElementById('languageSelect').value = lang;
             document.getElementById('settingsLanguageSelect').value = lang;
-            
+
             // Reload dynamic content with new language
             loadStats();
             loadApiKeys();
@@ -922,17 +944,17 @@
             document.getElementById('languageSelect').value = currentLang;
             document.getElementById('settingsLanguageSelect').value = currentLang;
             document.documentElement.lang = currentLang;
-            
+
             // Apply initial translations
             i18n.updateDOM();
             loadSupportedProviders();
             loadStats();
             loadApiKeys();
             loadRecentCalls();
-            
+
             // Setup form submission
             document.getElementById('keyForm').addEventListener('submit', handleKeyFormSubmit);
-            
+
             // Initialize charts
             initializeCharts();
         });
@@ -970,7 +992,7 @@
             try {
                 const response = await fetch('/api/analytics/hourly?hours=24');
                 const result = await response.json();
-                
+
                 const container = document.getElementById('hourlyRequestsChart').parentElement;
                 if (result.success && result.data.length > 0) {
                     const maxRequests = Math.max(...result.data.map(item => item.request_count));
@@ -1004,7 +1026,7 @@
             try {
                 const response = await fetch('/api/analytics/tokens');
                 const result = await response.json();
-                
+
                 const container = document.getElementById('tokenUsageChart').parentElement;
                 if (result.success && result.data.length > 0) {
                     const totalTokens = result.data.reduce((sum, item) => sum + item.total_tokens, 0);
@@ -1042,7 +1064,7 @@
             try {
                 const response = await fetch('/api/analytics/performance');
                 const result = await response.json();
-                
+
                 const container = document.getElementById('performanceChart').parentElement;
                 if (result.success && result.data.length > 0) {
                     const chartHtml = `
@@ -1085,7 +1107,7 @@
             try {
                 const response = await fetch('/api/stats');
                 const result = await response.json();
-                
+
                 const container = document.getElementById('costChart').parentElement;
                 if (result.success && result.data.length > 0) {
                     const totalCost = result.data.reduce((sum, item) => sum + item.total_cost, 0);
@@ -1127,18 +1149,18 @@
             document.querySelectorAll('.tab-content').forEach(content => {
                 content.classList.remove('active');
             });
-            
+
             // Remove active class from all tabs
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            
+
             // Show selected tab content
             document.getElementById(tabName).classList.add('active');
-            
+
             // Add active class to clicked tab
             event.target.classList.add('active');
-            
+
             // Load data for specific tabs
             if (tabName === 'keys') {
                 loadApiKeys();
@@ -1160,7 +1182,7 @@
                 const timeRange = document.getElementById('timeRange')?.value || '24h';
                 const response = await fetch(`/api/stats?timeRange=${timeRange}`);
                 const result = await response.json();
-                
+
                 if (result.success) {
                     displayStats(result.data);
                     // Update charts after loading stats
@@ -1175,17 +1197,17 @@
 
         function displayStats(stats) {
             const statsGrid = document.getElementById('statsGrid');
-            
+
             if (stats.length === 0) {
                 statsGrid.innerHTML = `<div class="loading">${i18n.t('dashboard.no_data')}</div>`;
                 return;
             }
-            
+
             const totalCalls = stats.reduce((sum, stat) => sum + stat.call_count, 0);
             const totalCost = stats.reduce((sum, stat) => sum + stat.total_cost, 0);
             const avgResponseTime = stats.reduce((sum, stat) => sum + (stat.avg_response_time * stat.call_count), 0) / totalCalls || 0;
             const successRate = stats.reduce((sum, stat) => sum + stat.success_count, 0) / totalCalls * 100 || 0;
-            
+
             statsGrid.innerHTML = `
                 <div class="stat-card">
                     <h3>${i18n.t('stats.total_calls')}</h3>
@@ -1211,7 +1233,7 @@
             try {
                 const response = await fetch('/api/keys');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     apiKeys = result.data;
                     displayApiKeys(result.data);
@@ -1225,12 +1247,12 @@
 
         function displayApiKeys(keys) {
             const container = document.getElementById('apiKeysTable');
-            
+
             if (keys.length === 0) {
                 container.innerHTML = `<div class="loading">${i18n.t('keys.no_keys')}</div>`;
                 return;
             }
-            
+
             const table = `
                 <table class="table">
                     <thead>
@@ -1264,7 +1286,7 @@
                     </tbody>
                 </table>
             `;
-            
+
             container.innerHTML = table;
         }
 
@@ -1273,7 +1295,7 @@
             try {
                 const response = await fetch('/api/calls/recent?limit=20');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     displayRecentCalls(result.data);
                 } else {
@@ -1286,14 +1308,14 @@
 
         function displayRecentCalls(calls) {
             const containers = [document.getElementById('recentCalls'), document.getElementById('callsTable')];
-            
+
             if (calls.length === 0) {
                 containers.forEach(container => {
                     if (container) container.innerHTML = `<div class="loading">${i18n.t('dashboard.no_calls')}</div>`;
                 });
                 return;
             }
-            
+
             const table = `
                 <table class="table">
                     <thead>
@@ -1326,7 +1348,7 @@
                     </tbody>
                 </table>
             `;
-            
+
             containers.forEach(container => {
                 if (container) container.innerHTML = table;
             });
@@ -1335,9 +1357,9 @@
         // Load supported providers
         async function loadSupportedProviders() {
             try {
-                const response = await fetch('/api/provider-configs');
+                const response = await fetch('/api/providers');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     supportedProviders = result.data;
                     updateProviderSelect();
@@ -1355,7 +1377,7 @@
 
             // Clear existing options except the first one
             providerSelect.innerHTML = '<option value="">选择提供商</option>';
-            
+
             // Add providers from configuration
             supportedProviders.forEach(provider => {
                 const option = document.createElement('option');
@@ -1377,7 +1399,7 @@
         function editKey(id) {
             const key = apiKeys.find(k => k.id === id);
             if (!key) return;
-            
+
             document.getElementById('modalTitle').textContent = i18n.t('modal.edit_key');
             document.getElementById('keyId').value = key.id;
             document.getElementById('provider').value = key.provider;
@@ -1387,7 +1409,7 @@
             document.getElementById('remainingQuota').value = key.remaining_quota;
             document.getElementById('totalQuota').value = key.total_quota;
             document.getElementById('isActive').checked = key.is_active;
-            
+
             updateProviderFields();
             currentEditingKey = key;
             document.getElementById('keyModal').style.display = 'block';
@@ -1402,7 +1424,7 @@
             const provider = document.getElementById('provider').value;
             const baseUrlField = document.getElementById('baseUrl');
             const costField = document.getElementById('costPerRequest');
-            
+
             // Find provider config
             const providerConfig = supportedProviders.find(p => p.provider === provider);
             if (providerConfig) {
@@ -1430,7 +1452,7 @@
         // Form submission
         async function handleKeyFormSubmit(e) {
             e.preventDefault();
-            
+
             const formData = {
                 provider: document.getElementById('provider').value,
                 name: document.getElementById('keyName').value,
@@ -1442,12 +1464,12 @@
                 total_quota: parseInt(document.getElementById('totalQuota').value),
                 is_active: document.getElementById('isActive').checked
             };
-            
+
             try {
                 const keyId = document.getElementById('keyId').value;
                 const url = keyId ? `/api/keys/${keyId}` : '/api/keys';
                 const method = keyId ? 'PUT' : 'POST';
-                
+
                 const response = await fetch(url, {
                     method: method,
                     headers: {
@@ -1455,9 +1477,9 @@
                     },
                     body: JSON.stringify(formData)
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     showAlert(keyId ? i18n.t('msg.key_updated') : i18n.t('msg.key_added'), 'success');
                     closeKeyModal();
@@ -1475,14 +1497,14 @@
             if (!confirm(i18n.t('msg.delete_confirm'))) {
                 return;
             }
-            
+
             try {
                 const response = await fetch(`/api/keys/${id}`, {
                     method: 'DELETE'
                 });
-                
+
                 const result = await response.json();
-                
+
                 if (result.success) {
                     showAlert(i18n.t('msg.key_deleted'), 'success');
                     loadApiKeys();
@@ -1499,13 +1521,13 @@
             // Remove existing alerts
             const existingAlerts = document.querySelectorAll('.alert');
             existingAlerts.forEach(alert => alert.remove());
-            
+
             const alert = document.createElement('div');
             alert.className = `alert alert-${type}`;
             alert.textContent = message;
-            
+
             document.querySelector('.container').insertBefore(alert, document.querySelector('.tabs'));
-            
+
             // Auto remove after 5 seconds
             setTimeout(() => {
                 alert.remove();
@@ -1523,9 +1545,9 @@
         // Load providers information
         async function loadProviders() {
             try {
-                const response = await fetch('/api/provider-configs');
+                const response = await fetch('/api/providers');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     displayProviders(result.data);
                 } else {
@@ -1538,17 +1560,17 @@
 
         function displayProviders(providers) {
             const container = document.getElementById('providersContainer');
-            
+
             if (providers.length === 0) {
                 container.innerHTML = `<div class="loading">${i18n.t('providers.no_providers')}</div>`;
                 return;
             }
-            
+
             const providersHtml = providers.map(provider => `
                 <div class="provider-card">
                     <div class="provider-header">
                         <div class="provider-icon">
-                            ${provider.real_icon_url 
+                            ${provider.real_icon_url
                                 ? `<img src="${provider.real_icon_url}" alt="${provider.display_name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                                    <span style="display: none;">${provider.icon || '🤖'}</span>`
                                 : (provider.icon || '🤖')
@@ -1564,7 +1586,7 @@
                             ${provider.console_url ? `<a href="${provider.console_url}" target="_blank" class="provider-link">控制台</a>` : ''}
                         </div>
                     </div>
-                    
+
                     <div class="provider-content">
                         <div class="provider-models">
                             <h5>支持的模型</h5>
@@ -1575,7 +1597,7 @@
                                 </div>
                             `).join('')}
                         </div>
-                        
+
                         <div class="provider-info">
                             <h5>详细信息</h5>
                             ${provider.registration_guide ? `
@@ -1600,14 +1622,14 @@
                     </div>
                 </div>
             `).join('');
-            
+
             container.innerHTML = providersHtml;
         }
 
         // Simple markdown renderer for basic formatting
         function renderMarkdown(markdown) {
             if (!markdown) return '';
-            
+
             return markdown
                 // Headers
                 .replace(/^### (.*$)/gim, '<h3>$1</h3>')
@@ -1643,7 +1665,7 @@
             try {
                 const response = await fetch('/api/models-view');
                 const result = await response.json();
-                
+
                 if (result.success) {
                     modelFamilies = result.data;
                     filteredModels = [...modelFamilies];
@@ -1659,12 +1681,12 @@
         // Display models
         function displayModels(models) {
             const container = document.getElementById('modelsContainer');
-            
+
             if (models.length === 0) {
                 container.innerHTML = '<div class="loading">没有找到匹配的模型</div>';
                 return;
             }
-            
+
             const modelsHtml = models.map(family => `
                 <div class="model-family-card">
                     <div class="model-family-header">
@@ -1676,7 +1698,7 @@
                             ${generateCapabilityBadges(family.capabilities)}
                         </div>
                     </div>
-                    
+
                     <div class="model-providers">
                         <h5>可用供应商 (${family.providers.length})</h5>
                         <div class="provider-comparison">
@@ -1713,7 +1735,7 @@
                     </div>
                 </div>
             `).join('');
-            
+
             container.innerHTML = modelsHtml;
         }
 
@@ -1742,21 +1764,21 @@
             };
 
             const search = document.getElementById('modelSearch').value;
-            
+
             try {
                 const params = new URLSearchParams();
-                
+
                 // Add capability filters
                 Object.entries(filters).forEach(([key, value]) => {
                     if (value) params.append(key, 'true');
                 });
-                
+
                 // Add search
                 if (search) params.append('search', search);
 
                 const response = await fetch(`/api/models-view?${params}`);
                 const result = await response.json();
-                
+
                 if (result.success) {
                     displayModels(result.data);
                 } else {
