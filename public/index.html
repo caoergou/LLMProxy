@@ -1341,10 +1341,10 @@
                         </div>
                         <div class="provider-title">
                             <h4>${provider.display_name || provider.name}</h4>
-                            <p>${provider.description || ''}</p>
+                            <p>${escapeHtml(provider.description || '')}</p>
                         </div>
                         <div class="provider-links">
-                            ${provider.website ? `<a href="${provider.website}" target="_blank" class="provider-link">官网</a>` : ''}
+                            ${provider.website ? `<a href="${sanitizeUrl(provider.website)}" target="_blank" class="provider-link">官网</a>` : ''}
                             ${provider.documentation ? `<a href="${provider.documentation}" target="_blank" class="provider-link">文档</a>` : ''}
                             ${provider.console_url ? `<a href="${provider.console_url}" target="_blank" class="provider-link">控制台</a>` : ''}
                         </div>
@@ -1405,13 +1405,13 @@
                 // Line breaks
                 .replace(/\n\n/g, '</p><p>')
                 .replace(/\n/g, '<br>')
-                // Wrap in paragraphs
-                .replace(/^(.*)$/gim, '<p>$1</p>')
+                // Wrap in paragraphs (only plain text lines)
+                .replace(/^(?!<.*>)(.*)$/gim, '<p>$1</p>')
                 // Clean up empty paragraphs
                 .replace(/<p><\/p>/g, '')
                 // Lists (simple implementation)
                 .replace(/^- (.*)$/gim, '<li>$1</li>')
-                .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+                .replace(/(<li>.*<\/li>)+/g, '<ul>$&</ul>')
                 // Code (simple implementation)
                 .replace(/`([^`]+)`/g, '<code>$1</code>');
         }
