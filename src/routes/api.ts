@@ -79,7 +79,7 @@ router.get('/provider-configs', async (req: Request, res: Response) => {
 router.all('/proxy/:provider', async (req: Request, res: Response) => {
     try {
         const provider = req.params.provider;
-        const endpoint = req.url;
+        const endpoint = req.path.replace(`/proxy/${provider}`, '');
         const method = req.method;
         const data = req.body;
         const headers = req.headers as Record<string, string>;

@@ -79,7 +79,7 @@ class ProxyService {
             
             // Log failed call
             if (selectedApiKey) {
-                await this.logApiCall(selectedApiKey.id!, endpoint, method, data, responseStatus, Date.now() - startTime, 0);
+                await this.logApiCall(selectedApiKey?.id || 0, endpoint, method, data, responseStatus, Date.now() - startTime, 0);
             }
 
             return {
