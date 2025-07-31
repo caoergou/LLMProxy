@@ -141,55 +141,89 @@ router.use('/proxy/:provider', async (req: Request, res: Response) => {
 // OpenAI-Compliant Unified Endpoints
 // ========================================
 
-// Primary chat completions endpoint - fully OpenAI compatible
+// Primary chat completions endpoint - fully OpenAI compatible with streaming support
 router.post('/v1/chat/completions', async (req: Request, res: Response) => {
     try {
         const openaiRequest = req.body;
         const preferredProvider = req.query.provider as string;
         
-        const result = await OpenAIUnifiedService.chatCompletions(openaiRequest, {
-            preferredProvider
-        });
-        
-        if (result.success) {
-            res.json(result.data);
+        // Check if streaming is requested
+        if (openaiRequest.stream) {
+            const result = await OpenAIUnifiedService.chatCompletionsStream(openaiRequest, res, {
+                preferredProvider
+            });
+            
+            if (!result.success && result.error) {
+                if (!res.headersSent) {
+                    const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
+                    res.status(status).json(result.error);
+                }
+            }
+            // For streaming, response is handled in the service method
         } else {
-            const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
-            res.status(status).json(result.error);
+            const result = await OpenAIUnifiedService.chatCompletions(openaiRequest, {
+                preferredProvider
+            });
+            
+            if (result.success) {
+                res.json(result.data);
+            } else {
+                const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
+                res.status(status).json(result.error);
+            }
         }
     } catch (error) {
-        res.status(500).json({
-            error: {
-                message: (error as Error).message,
-                type: 'server_error'
-            }
-        });
+        if (!res.headersSent) {
+            res.status(500).json({
+                error: {
+                    message: (error as Error).message,
+                    type: 'server_error'
+                }
+            });
+        }
     }
 });
 
-// Alternative endpoint for backward compatibility
+// Alternative endpoint for backward compatibility with streaming support
 router.post('/chat/completions', async (req: Request, res: Response) => {
     try {
         const openaiRequest = req.body;
         const preferredProvider = req.query.provider as string;
         
-        const result = await OpenAIUnifiedService.chatCompletions(openaiRequest, {
-            preferredProvider
-        });
-        
-        if (result.success) {
-            res.json(result.data);
+        // Check if streaming is requested
+        if (openaiRequest.stream) {
+            const result = await OpenAIUnifiedService.chatCompletionsStream(openaiRequest, res, {
+                preferredProvider
+            });
+            
+            if (!result.success && result.error) {
+                if (!res.headersSent) {
+                    const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
+                    res.status(status).json(result.error);
+                }
+            }
+            // For streaming, response is handled in the service method
         } else {
-            const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
-            res.status(status).json(result.error);
+            const result = await OpenAIUnifiedService.chatCompletions(openaiRequest, {
+                preferredProvider
+            });
+            
+            if (result.success) {
+                res.json(result.data);
+            } else {
+                const status = result.error?.error?.type === 'invalid_request_error' ? 400 : 500;
+                res.status(status).json(result.error);
+            }
         }
     } catch (error) {
-        res.status(500).json({
-            error: {
-                message: (error as Error).message,
-                type: 'server_error'
-            }
-        });
+        if (!res.headersSent) {
+            res.status(500).json({
+                error: {
+                    message: (error as Error).message,
+                    type: 'server_error'
+                }
+            });
+        }
     }
 });
 
