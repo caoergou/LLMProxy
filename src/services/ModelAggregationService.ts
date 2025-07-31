@@ -155,8 +155,8 @@ class ModelAggregationService {
         (sum, provider) => sum + provider.pricing.input_price, 0
       ) / family.providers.length;
       
-      return { ...family, avgPrice };
-    }).sort((a: any, b: any) => a.avgPrice - b.avgPrice);
+      return { ...family, avgPrice } as ModelFamilyWithAvgPrice;
+    }).sort((a: ModelFamilyWithAvgPrice, b: ModelFamilyWithAvgPrice) => a.avgPrice - b.avgPrice);
   }
 
   /**

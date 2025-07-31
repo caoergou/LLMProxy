@@ -322,7 +322,7 @@ router.get('/models-view', async (req: Request, res: Response) => {
         }
 
         // Apply capability filters
-        const capabilities: any = {};
+        const capabilities: Partial<ModelCapabilities> = {};
         if (reasoning === 'true') capabilities.reasoning = true;
         if (function_calling === 'true') capabilities.function_calling = true;
         if (vision === 'true') capabilities.vision = true;
