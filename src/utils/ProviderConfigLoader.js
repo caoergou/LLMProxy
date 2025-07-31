@@ -40,8 +40,18 @@ class ProviderConfigLoader {
     }
 
     validateProviderConfig(config) {
-        const requiredFields = ['provider', 'name', 'base_url', 'auth_type', 'request_format', 'response_format'];
-        return requiredFields.every(field => config.hasOwnProperty(field));
+        const requiredFields = ['provider', 'name', 'base_url', 'auth_type'];
+        const optionalFields = ['request_format', 'response_format'];
+        
+        // Check required fields
+        const hasRequiredFields = requiredFields.every(field => config.hasOwnProperty(field));
+        
+        // Check optional fields (if present, they must be valid)
+        const hasValidOptionalFields = optionalFields.every(field => 
+            !config.hasOwnProperty(field) || typeof config[field] === 'string'
+        );
+        
+        return hasRequiredFields && hasValidOptionalFields;
     }
 
     getAllProviders() {
