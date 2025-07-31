@@ -360,6 +360,37 @@ router.get('/usage/endpoints', async (req: Request, res: Response) => {
     }
 });
 
+// New enhanced analytics endpoints
+router.get('/analytics/performance', async (req: Request, res: Response) => {
+    try {
+        const timeRange = (req.query.timeRange as TimeRange) || '24h';
+        const metrics = await ApiCallModel.getPerformanceMetrics(timeRange);
+        res.json({ success: true, data: metrics });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
+router.get('/analytics/tokens', async (req: Request, res: Response) => {
+    try {
+        const timeRange = (req.query.timeRange as TimeRange) || '24h';
+        const stats = await ApiCallModel.getTokenUsageStats(timeRange);
+        res.json({ success: true, data: stats });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
+router.get('/analytics/hourly', async (req: Request, res: Response) => {
+    try {
+        const hours = parseInt(req.query.hours as string) || 24;
+        const metrics = await ApiCallModel.getHourlyMetrics(hours);
+        res.json({ success: true, data: metrics });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
 // Health check
 router.get('/health', (req: Request, res: Response) => {
     res.json({ 

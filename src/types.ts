@@ -24,6 +24,13 @@ export interface ApiCallData {
   response_status: number;
   response_time: number;
   cost?: number;
+  first_token_latency?: number;
+  total_tokens?: number;
+  prompt_tokens?: number;
+  completion_tokens?: number;
+  tokens_per_second?: number;
+  model_name?: string;
+  provider_name?: string;
   created_at?: string;
 }
 
@@ -86,3 +93,35 @@ export interface EndpointUsage {
 }
 
 export type TimeRange = '1h' | '24h' | '7d' | '30d';
+
+export interface PerformanceMetrics {
+  avg_first_token_latency: number;
+  avg_tokens_per_second: number;
+  total_tokens_consumed: number;
+  avg_response_time: number;
+  request_count: number;
+  provider: string;
+  model_name?: string;
+  time_period: string;
+}
+
+export interface TokenUsageStats {
+  provider: string;
+  model_name: string;
+  total_tokens: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  total_requests: number;
+  avg_tokens_per_request: number;
+  cost_per_token: number;
+  total_cost: number;
+}
+
+export interface RealTimeMetrics {
+  current_tps: number;
+  active_requests: number;
+  avg_latency_1min: number;
+  total_tokens_last_hour: number;
+  error_rate_last_hour: number;
+  cost_last_hour: number;
+}

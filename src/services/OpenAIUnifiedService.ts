@@ -108,6 +108,15 @@ class OpenAIUnifiedService {
       // Adapt response to OpenAI format
       const openaiResponse = adapter.adaptResponse(providerResponse.data, request);
 
+      // Extract performance metrics from response
+      const performanceMetrics = {
+        totalTokens: openaiResponse.usage?.total_tokens || 0,
+        promptTokens: openaiResponse.usage?.prompt_tokens || 0,
+        completionTokens: openaiResponse.usage?.completion_tokens || 0,
+        modelName: request.model,
+        providerName: provider
+      };
+
       // Log successful call
       await this.logApiCall(
         apiKey.id!,
@@ -116,7 +125,8 @@ class OpenAIUnifiedService {
         request,
         200,
         Date.now() - startTime,
-        apiKey.cost_per_request || 0
+        apiKey.cost_per_request || 0,
+        performanceMetrics
       );
 
       return {
@@ -221,7 +231,7 @@ class OpenAIUnifiedService {
       res.setHeader('Access-Control-Allow-Headers', 'Cache-Control');
 
       // Make streaming request to provider
-      const streamResponse = await this.makeProviderStreamRequest(
+      const streamMetrics = await this.makeProviderStreamRequest(
         provider,
         apiKey,
         adaptedRequest,
@@ -230,7 +240,18 @@ class OpenAIUnifiedService {
         res
       );
 
-      // Log successful call
+      // Log successful call (for streaming, we'll track basic metrics)
+      const performanceMetrics = {
+        modelName: request.model,
+        providerName: provider,
+        firstTokenLatency: streamMetrics.firstTokenLatency,
+        // For streaming, we can't get exact token counts until the stream completes
+        // We'll estimate or update this later if needed
+        totalTokens: 0,
+        promptTokens: 0,
+        completionTokens: 0
+      };
+
       await this.logApiCall(
         apiKey.id!,
         '/chat/completions',
@@ -238,7 +259,8 @@ class OpenAIUnifiedService {
         request,
         200,
         Date.now() - startTime,
-        apiKey.cost_per_request || 0
+        apiKey.cost_per_request || 0,
+        performanceMetrics
       );
 
       return {
@@ -515,7 +537,7 @@ class OpenAIUnifiedService {
     adapter: BaseFormatAdapter,
     originalRequest: OpenAIRequest,
     res: Response
-  ): Promise<void> {
+  ): Promise<{ firstTokenLatency?: number }> {
     const providerConfig = ProviderConfigLoader.getProvider(provider);
     if (!providerConfig) {
       throw new Error(`Provider configuration not found: ${provider}`);
@@ -547,55 +569,67 @@ class OpenAIUnifiedService {
       }
 
       let buffer = '';
+      let firstTokenTime: number | null = null;
+      const streamStartTime = Date.now();
 
-      response.data.on('data', (chunk: Buffer) => {
-        buffer += chunk.toString();
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || ''; // Keep incomplete line in buffer
+      try {
+        for await (const chunk of response.data) {
+          buffer += chunk.toString();
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (trimmed.startsWith('data: ')) {
-            const jsonData = trimmed.slice(6);
-            
-            if (jsonData === '[DONE]') {
-              res.write('data: [DONE]\n\n');
-              res.end();
-              return;
-            }
-
-            try {
-              const providerChunk = JSON.parse(jsonData);
-              const openaiChunk = adapter.adaptStreamChunk(providerChunk, originalRequest);
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (trimmed.startsWith('data: ')) {
+              const jsonData = trimmed.slice(6);
               
-              if (openaiChunk) {
-                res.write(`data: ${JSON.stringify(openaiChunk)}\n\n`);
+              if (jsonData === '[DONE]') {
+                res.write('data: [DONE]\n\n');
+                res.end();
+                resolve({ firstTokenLatency: firstTokenTime || 0 });
+                return;
               }
-            } catch (e) {
-              // Skip invalid JSON chunks
-              console.warn('Failed to parse streaming chunk:', e);
+
+              try {
+                const providerChunk = JSON.parse(jsonData);
+                const openaiChunk = adapter.adaptStreamChunk(providerChunk, originalRequest);
+                
+                if (openaiChunk) {
+                  // Track first token latency
+                  if (firstTokenTime === null && openaiChunk.choices?.[0]?.delta?.content) {
+                    firstTokenTime = Date.now() - streamStartTime;
+                  }
+                  
+                  res.write(`data: ${JSON.stringify(openaiChunk)}\n\n`);
+                }
+              } catch (e) {
+                // Skip invalid JSON chunks
+                console.warn('Failed to parse streaming chunk:', e);
+              }
             }
           }
-        }
-      });
+        });
 
-      response.data.on('end', () => {
-        if (!res.headersSent && !res.destroyed) {
-          res.write('data: [DONE]\n\n');
-          res.end();
-        }
-      });
+        response.data.on('end', () => {
+          if (!res.headersSent && !res.destroyed) {
+            res.write('data: [DONE]\n\n');
+            res.end();
+          }
+          resolve({ firstTokenLatency: firstTokenTime || 0 });
+        });
 
-      response.data.on('error', (error: Error) => {
-        if (!res.headersSent && !res.destroyed) {
-          res.write(`data: ${JSON.stringify({
-            error: {
-              message: error.message,
-              type: 'server_error'
-            }
-          })}\n\n`);
-          res.end();
-        }
+        response.data.on('error', (error: Error) => {
+          if (!res.headersSent && !res.destroyed) {
+            res.write(`data: ${JSON.stringify({
+              error: {
+                message: error.message,
+                type: 'server_error'
+              }
+            })}\n\n`);
+            res.end();
+          }
+          reject(error);
+        });
       });
 
     } catch (error: any) {
@@ -644,10 +678,18 @@ class OpenAIUnifiedService {
     requestData: any,
     responseStatus: number,
     responseTime: number,
-    cost: number
+    cost: number,
+    performanceMetrics?: {
+      firstTokenLatency?: number;
+      totalTokens?: number;
+      promptTokens?: number;
+      completionTokens?: number;
+      modelName?: string;
+      providerName?: string;
+    }
   ): Promise<void> {
     try {
-      await ApiCallModel.create({
+      const callData: any = {
         api_key_id: apiKeyId,
         endpoint,
         method,
@@ -655,7 +697,24 @@ class OpenAIUnifiedService {
         response_status: responseStatus,
         response_time: responseTime,
         cost
-      });
+      };
+
+      // Add performance metrics if provided
+      if (performanceMetrics) {
+        callData.first_token_latency = performanceMetrics.firstTokenLatency || 0;
+        callData.total_tokens = performanceMetrics.totalTokens || 0;
+        callData.prompt_tokens = performanceMetrics.promptTokens || 0;
+        callData.completion_tokens = performanceMetrics.completionTokens || 0;
+        callData.model_name = performanceMetrics.modelName;
+        callData.provider_name = performanceMetrics.providerName;
+        
+        // Calculate tokens per second if we have completion tokens and response time
+        if (performanceMetrics.completionTokens && responseTime > 0) {
+          callData.tokens_per_second = (performanceMetrics.completionTokens / responseTime) * 1000;
+        }
+      }
+
+      await ApiCallModel.create(callData);
     } catch (error) {
       console.error('Failed to log API call:', error);
     }

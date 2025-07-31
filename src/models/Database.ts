@@ -47,9 +47,22 @@ class Database {
                 response_status INTEGER,
                 response_time INTEGER,
                 cost REAL DEFAULT 0,
+                first_token_latency INTEGER DEFAULT 0,
+                total_tokens INTEGER DEFAULT 0,
+                prompt_tokens INTEGER DEFAULT 0,
+                completion_tokens INTEGER DEFAULT 0,
+                tokens_per_second REAL DEFAULT 0,
+                model_name TEXT,
+                provider_name TEXT,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (api_key_id) REFERENCES api_keys (id)
-            )`);
+            )`, (err) => {
+                if (err) {
+                    console.error('Error creating api_calls table:', err);
+                } else {
+                    this.migrateApiCallsTable();
+                }
+            });
 
             // Provider Templates table
             this.db!.run(`CREATE TABLE IF NOT EXISTS provider_templates (
@@ -100,6 +113,34 @@ class Database {
                     }
                 }
             );
+        });
+    }
+
+    private migrateApiCallsTable(): void {
+        if (!this.db) return;
+        
+        // Check if new columns exist and add them if they don't
+        const newColumns = [
+            'first_token_latency INTEGER DEFAULT 0',
+            'total_tokens INTEGER DEFAULT 0', 
+            'prompt_tokens INTEGER DEFAULT 0',
+            'completion_tokens INTEGER DEFAULT 0',
+            'tokens_per_second REAL DEFAULT 0',
+            'model_name TEXT',
+            'provider_name TEXT'
+        ];
+
+        newColumns.forEach(columnDef => {
+            const columnName = columnDef.split(' ')[0];
+            this.db!.run(`ALTER TABLE api_calls ADD COLUMN ${columnDef}`, (err: any) => {
+                if (err) {
+                    if (err.message.includes('duplicate column name')) {
+                        console.warn(`Column ${columnName} already exists. Skipping.`);
+                    } else {
+                        console.error(`Error adding column ${columnName}:`, err);
+                    }
+                }
+            });
         });
     }
 
