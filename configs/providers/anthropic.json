@@ -34,6 +34,11 @@
     "anthropic-version": "2023-06-01"
   },
   "icon": "🧠",
+  "real_icon_url": "https://www.anthropic.com/favicon.ico",
   "website": "https://anthropic.com",
-  "documentation": "https://docs.anthropic.com/"
+  "documentation": "https://docs.anthropic.com/",
+  "console_url": "https://console.anthropic.com/",
+  "registration_guide": "## 如何注册 Anthropic Claude API\n\n1. 访问 [Anthropic Console](https://console.anthropic.com/)\n2. 点击 \"Sign up\" 创建账户\n3. 验证邮箱地址\n4. 完成身份验证（可能需要提供电话号码）\n5. 进入控制台后，在 \"API Keys\" 部分生成新的 API 密钥\n6. 复制并安全保存您的 API 密钥\n\n**注意：** Anthropic 目前需要申请才能获得 API 访问权限，可能需要等待审核。",
+  "promotions": "## 最新优惠信息\n\n- 🎯 **测试版优惠**：Claude 3 目前提供较低的测试价格\n- 🔬 **研究折扣**：学术研究用户可申请特殊价格\n- 📊 **企业套餐**：大规模使用可联系销售获取定制方案\n- 💳 **免费额度**：新用户可获得一定的免费测试额度\n\n查看 [定价页面](https://www.anthropic.com/pricing) 了解最新价格。",
+  "additional_info": "## 使用指南\n\n### Claude 的优势\n- **安全性**：注重 AI 安全，减少有害输出\n- **长文本**：支持最高 200K tokens 的上下文长度\n- **推理能力**：擅长复杂推理和分析任务\n- **代码能力**：在编程任务上表现优秀\n\n### API 特点\n- **消息格式**：使用 messages API，支持对话历史\n- **流式输出**：支持 Server-Sent Events 流式响应\n- **系统提示**：通过 system 参数设定 AI 行为\n\n### 注意事项\n- API 访问需要申请审核\n- 某些地区可能有访问限制\n- 价格可能根据模型和使用量变化\n\n### 支持资源\n- [开发者文档](https://docs.anthropic.com/)\n- [API 参考](https://docs.anthropic.com/claude/reference/)\n- [安全指南](https://www.anthropic.com/safety)"
 }

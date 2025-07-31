@@ -572,64 +572,68 @@ class OpenAIUnifiedService {
       let firstTokenTime: number | null = null;
       const streamStartTime = Date.now();
 
-      try {
-        for await (const chunk of response.data) {
-          buffer += chunk.toString();
-          const lines = buffer.split('\n');
-          buffer = lines.pop() || ''; // Keep incomplete line in buffer
+      return new Promise<{ firstTokenLatency?: number }>((resolve, reject) => {
+        try {
+          response.data.on('data', (chunk: Buffer) => {
+            buffer += chunk.toString();
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (trimmed.startsWith('data: ')) {
-              const jsonData = trimmed.slice(6);
-              
-              if (jsonData === '[DONE]') {
-                res.write('data: [DONE]\n\n');
-                res.end();
-                resolve({ firstTokenLatency: firstTokenTime || 0 });
-                return;
-              }
-
-              try {
-                const providerChunk = JSON.parse(jsonData);
-                const openaiChunk = adapter.adaptStreamChunk(providerChunk, originalRequest);
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (trimmed.startsWith('data: ')) {
+                const jsonData = trimmed.slice(6);
                 
-                if (openaiChunk) {
-                  // Track first token latency
-                  if (firstTokenTime === null && openaiChunk.choices?.[0]?.delta?.content) {
-                    firstTokenTime = Date.now() - streamStartTime;
-                  }
-                  
-                  res.write(`data: ${JSON.stringify(openaiChunk)}\n\n`);
+                if (jsonData === '[DONE]') {
+                  res.write('data: [DONE]\n\n');
+                  res.end();
+                  resolve({ firstTokenLatency: firstTokenTime || 0 });
+                  return;
                 }
-              } catch (e) {
-                // Skip invalid JSON chunks
-                console.warn('Failed to parse streaming chunk:', e);
+
+                try {
+                  const providerChunk = JSON.parse(jsonData);
+                  const openaiChunk = adapter.adaptStreamChunk(providerChunk, originalRequest);
+                  
+                  if (openaiChunk) {
+                    // Track first token latency
+                    if (firstTokenTime === null && openaiChunk.choices?.[0]?.delta?.content) {
+                      firstTokenTime = Date.now() - streamStartTime;
+                    }
+                    
+                    res.write(`data: ${JSON.stringify(openaiChunk)}\n\n`);
+                  }
+                } catch (e) {
+                  // Skip invalid JSON chunks
+                  console.warn('Failed to parse streaming chunk:', e);
+                }
               }
             }
-          }
-        });
+          });
 
-        response.data.on('end', () => {
-          if (!res.headersSent && !res.destroyed) {
-            res.write('data: [DONE]\n\n');
-            res.end();
-          }
-          resolve({ firstTokenLatency: firstTokenTime || 0 });
-        });
+          response.data.on('end', () => {
+            if (!res.headersSent && !res.destroyed) {
+              res.write('data: [DONE]\n\n');
+              res.end();
+            }
+            resolve({ firstTokenLatency: firstTokenTime || 0 });
+          });
 
-        response.data.on('error', (error: Error) => {
-          if (!res.headersSent && !res.destroyed) {
-            res.write(`data: ${JSON.stringify({
-              error: {
-                message: error.message,
-                type: 'server_error'
-              }
-            })}\n\n`);
-            res.end();
-          }
-          reject(error);
-        });
+          response.data.on('error', (error: Error) => {
+            if (!res.headersSent && !res.destroyed) {
+              res.write(`data: ${JSON.stringify({
+                error: {
+                  message: error.message,
+                  type: 'server_error'
+                }
+              })}\n\n`);
+              res.end();
+            }
+            reject(error);
+          });
+        } catch (err) {
+          reject(err);
+        }
       });
 
     } catch (error: any) {
