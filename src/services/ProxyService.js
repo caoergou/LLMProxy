@@ -217,6 +217,59 @@ class ProxyService {
     isProviderSupported(providerId) {
         return this.providerConfig.hasProvider(providerId);
     }
+
+    // Get provider for a given model name
+    async getProviderForModel(modelName) {
+        const providers = this.providerConfig.getAllProviders();
+        
+        for (const provider of providers) {
+            if (provider.models) {
+                for (const model of provider.models) {
+                    if (model.name === modelName) {
+                        return provider.provider;
+                    }
+                }
+            }
+        }
+        
+        // If exact match not found, try partial matching for common model names
+        for (const provider of providers) {
+            if (provider.models) {
+                for (const model of provider.models) {
+                    // Handle common variations like gpt-3.5-turbo vs gpt-35-turbo
+                    const normalizedModelName = modelName.replace(/[-_]/g, '');
+                    const normalizedConfigName = model.name.replace(/[-_]/g, '');
+                    
+                    if (normalizedConfigName.includes(normalizedModelName) || 
+                        normalizedModelName.includes(normalizedConfigName)) {
+                        return provider.provider;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    // Get all available models across all providers
+    getAllAvailableModels() {
+        const providers = this.providerConfig.getAllProviders();
+        const models = [];
+        
+        for (const provider of providers) {
+            if (provider.models) {
+                for (const model of provider.models) {
+                    models.push({
+                        ...model,
+                        provider: provider.provider,
+                        provider_name: provider.display_name
+                    });
+                }
+            }
+        }
+        
+        return models;
+    }
 }
 
 module.exports = new ProxyService();

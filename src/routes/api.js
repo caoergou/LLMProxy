@@ -160,4 +160,135 @@ router.get('/health', (req, res) => {
     });
 });
 
+// ========= OpenAI-Compatible v1 API Endpoints =========
+
+// Get all available models across all providers (OpenAI-compatible)
+router.get('/v1/models', async (req, res) => {
+    try {
+        const providers = ProviderConfigLoader.getAllProviders();
+        const models = [];
+        
+        // Aggregate all models from all providers
+        for (const provider of providers) {
+            if (provider.models) {
+                for (const model of provider.models) {
+                    models.push({
+                        id: model.name,
+                        object: 'model',
+                        created: Date.now(),
+                        owned_by: provider.provider,
+                        permission: [],
+                        root: model.name,
+                        parent: null,
+                        // Additional metadata
+                        provider: provider.provider,
+                        display_name: model.display_name,
+                        description: model.description,
+                        provider_name: provider.display_name
+                    });
+                }
+            }
+        }
+        
+        res.json({
+            object: 'list',
+            data: models
+        });
+    } catch (error) {
+        res.status(500).json({ 
+            error: {
+                message: error.message,
+                type: 'api_error',
+                code: 'internal_server_error'
+            }
+        });
+    }
+});
+
+// OpenAI-compatible chat completions endpoint
+router.post('/v1/chat/completions', async (req, res) => {
+    try {
+        const data = req.body;
+        
+        // Determine provider based on model name
+        const provider = await ProxyService.getProviderForModel(data.model);
+        if (!provider) {
+            return res.status(400).json({
+                error: {
+                    message: `Model '${data.model}' not found`,
+                    type: 'invalid_request_error',
+                    code: 'model_not_found'
+                }
+            });
+        }
+        
+        const result = await ProxyService.proxyRequest(provider, '/chat/completions', 'POST', data, req.headers);
+        
+        if (result.success) {
+            res.json(result.data);
+        } else {
+            res.status(result.status || 500).json({ 
+                error: {
+                    message: result.error,
+                    type: 'api_error',
+                    code: 'provider_error',
+                    provider: result.provider,
+                    api_key_name: result.api_key_name
+                }
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ 
+            error: {
+                message: error.message,
+                type: 'api_error',
+                code: 'internal_server_error'
+            }
+        });
+    }
+});
+
+// OpenAI-compatible completions endpoint (legacy)
+router.post('/v1/completions', async (req, res) => {
+    try {
+        const data = req.body;
+        
+        // Determine provider based on model name
+        const provider = await ProxyService.getProviderForModel(data.model);
+        if (!provider) {
+            return res.status(400).json({
+                error: {
+                    message: `Model '${data.model}' not found`,
+                    type: 'invalid_request_error',
+                    code: 'model_not_found'
+                }
+            });
+        }
+        
+        const result = await ProxyService.proxyRequest(provider, '/completions', 'POST', data, req.headers);
+        
+        if (result.success) {
+            res.json(result.data);
+        } else {
+            res.status(result.status || 500).json({ 
+                error: {
+                    message: result.error,
+                    type: 'api_error',
+                    code: 'provider_error',
+                    provider: result.provider,
+                    api_key_name: result.api_key_name
+                }
+            });
+        }
+    } catch (error) {
+        res.status(500).json({ 
+            error: {
+                message: error.message,
+                type: 'api_error',
+                code: 'internal_server_error'
+            }
+        });
+    }
+});
+
 module.exports = router;
