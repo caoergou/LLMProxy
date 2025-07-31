@@ -19,7 +19,15 @@
     "build:all-platforms": "npm run tauri:build -- --target x86_64-pc-windows-msvc --target x86_64-apple-darwin --target x86_64-unknown-linux-gnu",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["api-proxy", "ai", "openai", "claude", "tauri", "desktop", "cross-platform"],
+  "keywords": [
+    "api-proxy",
+    "ai",
+    "openai",
+    "claude",
+    "tauri",
+    "desktop",
+    "cross-platform"
+  ],
   "author": "caoergou",
   "license": "MIT",
   "repository": {

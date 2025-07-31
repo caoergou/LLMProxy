@@ -100,6 +100,30 @@ npm run build:all-platforms
 - **优雅关闭**：应用退出时自动清理 Node.js 进程
 - **数据隔离**：使用系统数据目录存储应用数据
 
+### 📁 项目结构优化
+
+为了减少版本控制的复杂性，`src-tauri` 目录只包含 Tauri 特定的文件：
+
+```
+src-tauri/
+├── Cargo.toml          # Rust 依赖和元数据
+├── tauri.conf.json     # Tauri 配置文件
+├── src/
+│   ├── main.rs         # Rust 应用程序入口
+│   └── lib.rs          # Rust 库和 Tauri 命令
+├── icons/              # 不同平台的应用图标
+├── capabilities/       # Tauri 权限配置
+├── .gitignore         # 忽略生成的 TypeScript 文件
+└── target/             # Rust 构建产物（自动生成）
+```
+
+**重要说明**：所有 TypeScript/JavaScript 文件（如 `models/`、`routes/`、`services/` 等）都是在构建过程中从 `dist/` 目录自动复制的，不应提交到版本控制系统。这样可以：
+
+- 减少代码重复
+- 避免同步问题  
+- 保持源代码的单一真实来源
+- 减少 PR 的文件变更数量
+
 ## 🚀 部署指南
 
 ### 自动化构建
