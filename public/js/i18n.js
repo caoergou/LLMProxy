@@ -15,6 +15,7 @@ class I18n {
                 
                 // Navigation tabs
                 'nav.dashboard': '仪表板',
+                'nav.analytics': '分析',
                 'nav.keys': 'API 密钥',
                 'nav.logs': '调用日志',
                 'nav.settings': '设置',
@@ -25,10 +26,27 @@ class I18n {
                 'dashboard.loading_calls': '加载最近调用记录中...',
                 'dashboard.no_data': '暂无统计数据',
                 'dashboard.no_calls': '暂无调用记录',
+                'dashboard.performance_metrics': '性能指标',
+                'dashboard.token_usage': 'Token 使用情况',
+                'dashboard.provider_distribution': '提供商分布',
+                'dashboard.cost_analysis': '成本分析',
                 'stats.total_calls': '总调用次数',
                 'stats.total_cost': '总成本',
                 'stats.avg_response_time': '平均响应时间',
                 'stats.success_rate': '成功率',
+                
+                // Enhanced Metrics
+                'metrics.total_tokens': '总 Token 数',
+                'metrics.tokens_per_second': 'Token/秒',
+                'metrics.first_byte_time': '首字节延迟',
+                'metrics.throughput': '吞吐量',
+                
+                // Analytics
+                'analytics.title': '详细分析',
+                'analytics.token_usage_breakdown': 'Token 使用详情',
+                'analytics.performance_analysis': '性能分析',
+                'analytics.api_key_comparison': 'API 密钥性能对比',
+                'analytics.loading': '加载分析数据中...',
                 
                 // API Keys
                 'keys.title': 'API 密钥管理',
@@ -119,6 +137,7 @@ class I18n {
                 
                 // Navigation tabs
                 'nav.dashboard': 'Dashboard',
+                'nav.analytics': 'Analytics',
                 'nav.keys': 'API Keys',
                 'nav.logs': 'Call Logs',
                 'nav.settings': 'Settings',
@@ -129,10 +148,27 @@ class I18n {
                 'dashboard.loading_calls': 'Loading recent call records...',
                 'dashboard.no_data': 'No statistical data',
                 'dashboard.no_calls': 'No call records',
+                'dashboard.performance_metrics': 'Performance Metrics',
+                'dashboard.token_usage': 'Token Usage',
+                'dashboard.provider_distribution': 'Provider Distribution',
+                'dashboard.cost_analysis': 'Cost Analysis',
                 'stats.total_calls': 'Total Calls',
                 'stats.total_cost': 'Total Cost',
                 'stats.avg_response_time': 'Average Response Time',
                 'stats.success_rate': 'Success Rate',
+                
+                // Enhanced Metrics
+                'metrics.total_tokens': 'Total Tokens',
+                'metrics.tokens_per_second': 'Tokens/Sec',
+                'metrics.first_byte_time': 'First Byte Latency',
+                'metrics.throughput': 'Throughput',
+                
+                // Analytics
+                'analytics.title': 'Detailed Analytics',
+                'analytics.token_usage_breakdown': 'Token Usage Breakdown',
+                'analytics.performance_analysis': 'Performance Analysis',
+                'analytics.api_key_comparison': 'API Key Performance Comparison',
+                'analytics.loading': 'Loading analytics data...',
                 
                 // API Keys
                 'keys.title': 'API Key Management',

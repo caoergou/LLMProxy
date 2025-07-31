@@ -48,8 +48,19 @@ class Database {
                 response_time INTEGER,
                 cost REAL DEFAULT 0,
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                first_byte_time INTEGER,
+                tokens_prompt INTEGER,
+                tokens_completion INTEGER,
+                tokens_total INTEGER,
+                request_size INTEGER,
+                response_size INTEGER,
+                model_used TEXT,
+                provider_response_time INTEGER,
                 FOREIGN KEY (api_key_id) REFERENCES api_keys (id)
             )`);
+
+            // Migrate existing api_calls table to add new columns
+            this.migrateApiCallsTable();
 
             // Provider Templates table
             this.db!.run(`CREATE TABLE IF NOT EXISTS provider_templates (
@@ -68,6 +79,31 @@ class Database {
                     console.error('Error creating provider_templates table:', err);
                 } else {
                     this.seedProviderTemplates();
+                }
+            });
+        });
+    }
+
+    private migrateApiCallsTable(): void {
+        if (!this.db) return;
+
+        // Add new columns if they don't exist
+        const newColumns = [
+            'first_byte_time INTEGER',
+            'tokens_prompt INTEGER',
+            'tokens_completion INTEGER', 
+            'tokens_total INTEGER',
+            'request_size INTEGER',
+            'response_size INTEGER',
+            'model_used TEXT',
+            'provider_response_time INTEGER'
+        ];
+
+        newColumns.forEach(column => {
+            const columnName = column.split(' ')[0];
+            this.db!.run(`ALTER TABLE api_calls ADD COLUMN ${column}`, (err) => {
+                if (err && !err.message.includes('duplicate column name')) {
+                    console.error(`Error adding column ${columnName}:`, err.message);
                 }
             });
         });

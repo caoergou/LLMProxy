@@ -306,6 +306,28 @@ router.get('/stats', async (req: Request, res: Response) => {
     }
 });
 
+// Enhanced token usage statistics
+router.get('/stats/token-usage', async (req: Request, res: Response) => {
+    try {
+        const timeRange = (req.query.timeRange as TimeRange) || '24h';
+        const tokenStats = await ApiCallModel.getTokenUsageStats(timeRange);
+        res.json({ success: true, data: tokenStats });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
+// Performance metrics
+router.get('/stats/performance', async (req: Request, res: Response) => {
+    try {
+        const timeRange = (req.query.timeRange as TimeRange) || '24h';
+        const performanceMetrics = await ApiCallModel.getPerformanceMetrics(timeRange);
+        res.json({ success: true, data: performanceMetrics });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
 router.get('/calls/recent', async (req: Request, res: Response) => {
     try {
         const limit = parseInt(req.query.limit as string) || 50;

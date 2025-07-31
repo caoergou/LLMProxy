@@ -25,6 +25,15 @@ export interface ApiCallData {
   response_time: number;
   cost?: number;
   created_at?: string;
+  // Enhanced performance metrics
+  first_byte_time?: number;       // Time to first byte (ms)
+  tokens_prompt?: number;         // Input tokens count
+  tokens_completion?: number;     // Output tokens count
+  tokens_total?: number;          // Total tokens used
+  request_size?: number;          // Request payload size (bytes)
+  response_size?: number;         // Response payload size (bytes)
+  model_used?: string;            // Actual model used
+  provider_response_time?: number; // Provider-specific response time
 }
 
 export interface ProviderConfig {
@@ -61,6 +70,36 @@ export interface ApiStats {
   total_cost: number;
   success_count: number;
   error_count: number;
+  // Enhanced metrics
+  avg_first_byte_time?: number;
+  total_tokens?: number;
+  avg_tokens_per_request?: number;
+  tokens_per_second?: number;
+  avg_request_size?: number;
+  avg_response_size?: number;
+}
+
+export interface TokenUsageStats {
+  provider: string;
+  api_key_name: string;
+  total_tokens: number;
+  prompt_tokens: number;
+  completion_tokens: number;
+  cost_per_token: number;
+  requests_count: number;
+  avg_tokens_per_request: number;
+  token_efficiency: number; // completion_tokens / prompt_tokens
+}
+
+export interface PerformanceMetrics {
+  avg_response_time: number;
+  avg_first_byte_time: number;
+  p95_response_time: number;
+  p99_response_time: number;
+  tokens_per_second: number;
+  throughput_requests_per_minute: number;
+  error_rate: number;
+  success_rate: number;
 }
 
 export interface RecentCall {
