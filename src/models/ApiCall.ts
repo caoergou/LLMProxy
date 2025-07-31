@@ -185,12 +185,12 @@ class ApiCallModel {
                         SUM(ac.total_tokens) as total_tokens_consumed,
                         AVG(ac.response_time) as avg_response_time,
                         COUNT(*) as request_count,
-                        '${timeRange}' as time_period
+                        ? as time_period
                     FROM api_calls ac
                     LEFT JOIN api_keys ak ON ac.api_key_id = ak.id
                     WHERE ${timeFilter} AND ac.response_status >= 200 AND ac.response_status < 300
                     GROUP BY COALESCE(ac.provider_name, ak.provider), ac.model_name
-                    ORDER BY total_tokens_consumed DESC`, [], (err: any, rows: any) => {
+                    ORDER BY total_tokens_consumed DESC`, [timeRange], (err: any, rows: any) => {
                 if (err) {
                     reject(err);
                 } else {
@@ -268,9 +268,9 @@ class ApiCallModel {
                         COUNT(CASE WHEN response_status >= 200 AND response_status < 300 THEN 1 END) as success_count,
                         COUNT(CASE WHEN response_status >= 400 THEN 1 END) as error_count
                     FROM api_calls
-                    WHERE datetime(created_at) >= datetime('now', '-${hours} hours')
+                    WHERE datetime(created_at) >= datetime('now', ?)
                     GROUP BY strftime('%Y-%m-%d %H:00:00', created_at)
-                    ORDER BY hour`, [], (err: any, rows: any) => {
+                    ORDER BY hour`, [`-${hours} hours`], (err: any, rows: any) => {
                 if (err) {
                     reject(err);
                 } else {

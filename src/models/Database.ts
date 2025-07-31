@@ -133,8 +133,12 @@ class Database {
         newColumns.forEach(columnDef => {
             const columnName = columnDef.split(' ')[0];
             this.db!.run(`ALTER TABLE api_calls ADD COLUMN ${columnDef}`, (err: any) => {
-                if (err && !err.message.includes('duplicate column name')) {
-                    console.error(`Error adding column ${columnName}:`, err);
+                if (err) {
+                    if (err.message.includes('duplicate column name')) {
+                        console.warn(`Column ${columnName} already exists. Skipping.`);
+                    } else {
+                        console.error(`Error adding column ${columnName}:`, err);
+                    }
                 }
             });
         });

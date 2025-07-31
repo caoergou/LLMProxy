@@ -572,8 +572,8 @@ class OpenAIUnifiedService {
       let firstTokenTime: number | null = null;
       const streamStartTime = Date.now();
 
-      return new Promise((resolve, reject) => {
-        response.data.on('data', (chunk: Buffer) => {
+      try {
+        for await (const chunk of response.data) {
           buffer += chunk.toString();
           const lines = buffer.split('\n');
           buffer = lines.pop() || ''; // Keep incomplete line in buffer
