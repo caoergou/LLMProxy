@@ -2,10 +2,12 @@
   "name": "api-proxy",
   "version": "1.0.0",
   "description": "构建本地轻量服务，提供统一接口供客户端调用，集中加密管理多平台 API 密钥，跟踪各 API 价格、剩余额度。按成本 / 额度优先等策略自动选最优 API，支持格式转换适配不同厂商。含本地 Web 界面，可视化管理资源与调用统计。仅本地存储数据，轻量安全，易配置。",
-  "main": "src/server.js",
+  "main": "dist/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "node src/server.js",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node src/server.ts",
+    "dev:watch": "ts-node --watch src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -18,5 +20,13 @@
     "dotenv": "^17.2.1",
     "express": "^5.1.0",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/crypto-js": "^4.2.2",
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }
