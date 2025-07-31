@@ -1,0 +1,119 @@
+{
+  "provider": "openai",
+  "name": "OpenAI",
+  "display_name": "OpenAI GPT",
+  "description": "OpenAI's GPT models including GPT-4, GPT-3.5-turbo",
+  "base_url": "https://api.openai.com/v1",
+  "auth_type": "bearer",
+  "request_format": "openai",
+  "response_format": "openai",
+  "cost_per_request": 0.002,
+  "endpoints": [
+    "/chat/completions",
+    "/completions",
+    "/embeddings"
+  ],
+  "models": [
+    {
+      "name": "gpt-4",
+      "display_name": "GPT-4",
+      "model_family": "gpt-4",
+      "description": "最先进的大型语言模型，具备强大的推理能力",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": false,
+        "code_generation": true,
+        "multimodal": false,
+        "streaming": true,
+        "context_length": 8192
+      },
+      "pricing": {
+        "input_price": 0.03,
+        "output_price": 0.06,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 2.5,
+        "availability": 99.9
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 3500,
+        "tpm_limit": 40000
+      }
+    },
+    {
+      "name": "gpt-4-turbo",
+      "display_name": "GPT-4 Turbo",
+      "model_family": "gpt-4",
+      "description": "更快速的GPT-4版本，支持更长的上下文",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": true,
+        "code_generation": true,
+        "multimodal": true,
+        "streaming": true,
+        "context_length": 128000
+      },
+      "pricing": {
+        "input_price": 0.01,
+        "output_price": 0.03,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 1.8,
+        "availability": 99.9
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 5000,
+        "tpm_limit": 80000
+      }
+    },
+    {
+      "name": "gpt-3.5-turbo",
+      "display_name": "GPT-3.5 Turbo",
+      "model_family": "gpt-3.5",
+      "description": "快速高效的模型，适合大部分任务",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": false,
+        "code_generation": true,
+        "multimodal": false,
+        "streaming": true,
+        "context_length": 16385
+      },
+      "pricing": {
+        "input_price": 0.001,
+        "output_price": 0.002,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 1.2,
+        "availability": 99.95
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 10000,
+        "tpm_limit": 160000
+      }
+    }
+  ],
+  "headers": {
+    "Authorization": "Bearer {{api_key}}",
+    "Content-Type": "application/json"
+  },
+  "icon": "🤖",
+  "real_icon_url": "https://openai.com/favicon.ico",
+  "website": "https://openai.com",
+  "documentation": "https://platform.openai.com/docs",
+  "console_url": "https://platform.openai.com/playground",
+  "registration_guide": "访问 [OpenAI Platform](https://platform.openai.com) 注册账户，在 API Keys 页面创建密钥。新用户获得免费额度。",
+  "notes": "支持 GPT-4、GPT-3.5-turbo 等模型。付费用户享有更高的速率限制。详见 [OpenAI 定价](https://openai.com/pricing)。"
+}

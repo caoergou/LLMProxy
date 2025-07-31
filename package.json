@@ -4,15 +4,28 @@
   "description": "构建本地轻量服务，提供统一接口供客户端调用，集中加密管理多平台 API 密钥，跟踪各 API 价格、剩余额度。按成本 / 额度优先等策略自动选最优 API，支持格式转换适配不同厂商。含本地 Web 界面，可视化管理资源与调用统计。仅本地存储数据，轻量安全，易配置。",
   "main": "dist/server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run copy-configs",
+    "copy-configs": "cp -r configs dist/ 2>/dev/null || robocopy configs dist\\configs /e /nfl /ndl /njh /njs /nc /ns /np 2>nul || true",
     "start": "node dist/server.js",
     "dev": "ts-node src/server.ts",
     "dev:watch": "ts-node --watch src/server.ts",
+    "tauri:dev": "npm run build && npm run copy-to-tauri && tauri dev",
+    "tauri:build": "npm run build && npm run copy-to-tauri && tauri build",
+    "tauri:build:debug": "npm run build && npm run copy-to-tauri && tauri build --debug",
+    "copy-to-tauri": "npm run copy-dist-to-tauri && npm run copy-configs-to-tauri && npm run install-tauri-deps",
+    "copy-dist-to-tauri": "cp -r dist/* src-tauri/ 2>/dev/null || robocopy dist src-tauri /e /nfl /ndl /njh /njs /nc /ns /np 2>nul || true",
+    "copy-configs-to-tauri": "cp -r configs src-tauri/ 2>/dev/null || robocopy configs src-tauri\\configs /e /nfl /ndl /njh /njs /nc /ns /np 2>nul || true",
+    "install-tauri-deps": "cd src-tauri && npm install --omit=dev",
+    "build:all-platforms": "npm run tauri:build -- --target x86_64-pc-windows-msvc --target x86_64-apple-darwin --target x86_64-unknown-linux-gnu",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["api-proxy", "ai", "openai", "claude", "tauri", "desktop", "cross-platform"],
+  "author": "caoergou",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/caoergou/api-proxy.git"
+  },
   "dependencies": {
     "axios": "^1.11.0",
     "cors": "^2.8.5",
@@ -22,6 +35,7 @@
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.7.1",
     "@types/cors": "^2.8.19",
     "@types/crypto-js": "^4.2.2",
     "@types/express": "^5.0.3",

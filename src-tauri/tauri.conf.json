@@ -1,0 +1,75 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "API Proxy",
+  "version": "1.0.0",
+  "identifier": "com.caoergou.api-proxy",
+  "build": {
+    "frontendDist": "../public",
+    "beforeDevCommand": "npm run tauri:dev",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "API Proxy 管理面板",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "minWidth": 800,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "category": "DeveloperTool",
+    "shortDescription": "AI API Proxy and Management Tool",
+    "longDescription": "A lightweight local service that provides unified interface for client calls, centrally manages encrypted API keys from multiple platforms, tracks API pricing and remaining quotas.",
+    "copyright": "Copyright (c) 2024 caoergou",
+    "resources": [
+      "configs/**/*",
+      "*.js",
+      "*.js.map",
+      "models/**/*",
+      "routes/**/*",
+      "services/**/*",
+      "utils/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "externalBin": [],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": ""
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "",
+      "exceptionDomain": ""
+    },
+    "linux": {
+      "deb": {
+        "depends": [],
+        "files": {}
+      },
+      "appimage": {
+        "bundleMediaFramework": false,
+        "files": {}
+      }
+    }
+  }
+}

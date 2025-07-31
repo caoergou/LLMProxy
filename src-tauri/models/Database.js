@@ -1,37 +1,73 @@
-import { Database as SQLiteDatabase } from 'sqlite3';
-import * as path from 'path';
-import ProviderConfigLoader from '../utils/ProviderConfigLoader';
-
+"use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const sqlite3_1 = require("sqlite3");
+const path = __importStar(require("path"));
+const ProviderConfigLoader_1 = __importDefault(require("../utils/ProviderConfigLoader"));
 class Database {
-    private db: SQLiteDatabase | null = null;
-
-    init(): void {
+    constructor() {
+        this.db = null;
+    }
+    init() {
         // Use environment variable for database path if set (for Tauri), otherwise use default
         const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../data/api_proxy.db');
-        
         // Ensure directory exists
         const dbDir = path.dirname(dbPath);
         const fs = require('fs');
         if (!fs.existsSync(dbDir)) {
             fs.mkdirSync(dbDir, { recursive: true });
         }
-        
-        this.db = new SQLiteDatabase(dbPath, (err) => {
+        this.db = new sqlite3_1.Database(dbPath, (err) => {
             if (err) {
                 console.error('Error opening database:', err.message);
-            } else {
+            }
+            else {
                 console.log('Connected to SQLite database at:', dbPath);
                 this.createTables();
             }
         });
     }
-
-    private createTables(): void {
-        if (!this.db) return;
-        
+    createTables() {
+        if (!this.db)
+            return;
         // API Keys table
         this.db.serialize(() => {
-            this.db!.run(`CREATE TABLE IF NOT EXISTS api_keys (
+            this.db.run(`CREATE TABLE IF NOT EXISTS api_keys (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 provider TEXT NOT NULL,
                 name TEXT NOT NULL,
@@ -45,9 +81,8 @@ class Database {
                 created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                 updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
             )`);
-
             // API Calls table for tracking usage
-            this.db!.run(`CREATE TABLE IF NOT EXISTS api_calls (
+            this.db.run(`CREATE TABLE IF NOT EXISTS api_calls (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 api_key_id INTEGER,
                 endpoint TEXT NOT NULL,
@@ -68,13 +103,13 @@ class Database {
             )`, (err) => {
                 if (err) {
                     console.error('Error creating api_calls table:', err);
-                } else {
+                }
+                else {
                     this.migrateApiCallsTable();
                 }
             });
-
             // Provider Templates table
-            this.db!.run(`CREATE TABLE IF NOT EXISTS provider_templates (
+            this.db.run(`CREATE TABLE IF NOT EXISTS provider_templates (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 provider TEXT UNIQUE NOT NULL,
                 name TEXT NOT NULL,
@@ -88,18 +123,18 @@ class Database {
             )`, (err) => {
                 if (err) {
                     console.error('Error creating provider_templates table:', err);
-                } else {
+                }
+                else {
                     this.seedProviderTemplates();
                 }
             });
         });
     }
-
-    private seedProviderTemplates(): void {
-        if (!this.db) return;
-        
+    seedProviderTemplates() {
+        if (!this.db)
+            return;
         // Load providers from configuration files
-        const providers = ProviderConfigLoader.getAllProviders().map(config => ({
+        const providers = ProviderConfigLoader_1.default.getAllProviders().map(config => ({
             provider: config.provider,
             name: config.name,
             base_url: config.base_url,
@@ -109,59 +144,52 @@ class Database {
             cost_per_request: config.cost_per_request,
             endpoints: JSON.stringify(config.endpoints)
         }));
-
         providers.forEach(provider => {
-            this.db!.run(`INSERT OR IGNORE INTO provider_templates 
+            this.db.run(`INSERT OR IGNORE INTO provider_templates 
                 (provider, name, base_url, auth_type, request_format, response_format, cost_per_request, endpoints)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-                [provider.provider, provider.name, provider.base_url, provider.auth_type, 
-                 provider.request_format, provider.response_format, provider.cost_per_request, provider.endpoints],
-                (err) => {
-                    if (err) {
-                        console.error('Error seeding provider template:', err);
-                    }
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [provider.provider, provider.name, provider.base_url, provider.auth_type,
+                provider.request_format, provider.response_format, provider.cost_per_request, provider.endpoints], (err) => {
+                if (err) {
+                    console.error('Error seeding provider template:', err);
                 }
-            );
+            });
         });
     }
-
-    private migrateApiCallsTable(): void {
-        if (!this.db) return;
-        
+    migrateApiCallsTable() {
+        if (!this.db)
+            return;
         // Check if new columns exist and add them if they don't
         const newColumns = [
             'first_token_latency INTEGER DEFAULT 0',
-            'total_tokens INTEGER DEFAULT 0', 
+            'total_tokens INTEGER DEFAULT 0',
             'prompt_tokens INTEGER DEFAULT 0',
             'completion_tokens INTEGER DEFAULT 0',
             'tokens_per_second REAL DEFAULT 0',
             'model_name TEXT',
             'provider_name TEXT'
         ];
-
         newColumns.forEach(columnDef => {
             const columnName = columnDef.split(' ')[0];
-            this.db!.run(`ALTER TABLE api_calls ADD COLUMN ${columnDef}`, (err: any) => {
+            this.db.run(`ALTER TABLE api_calls ADD COLUMN ${columnDef}`, (err) => {
                 if (err) {
                     if (err.message.includes('duplicate column name')) {
                         console.warn(`Column ${columnName} already exists. Skipping.`);
-                    } else {
+                    }
+                    else {
                         console.error(`Error adding column ${columnName}:`, err);
                     }
                 }
             });
         });
     }
-
-    getDb(): SQLiteDatabase | null {
+    getDb() {
         return this.db;
     }
-
-    close(): void {
+    close() {
         if (this.db) {
             this.db.close();
         }
     }
 }
-
-export default new Database();
+exports.default = new Database();
+//# sourceMappingURL=Database.js.map

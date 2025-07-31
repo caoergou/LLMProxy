@@ -1,6 +1,89 @@
 # 贡献指南
 
-欢迎为 API Proxy 项目贡献代码！本指南将帮助你了解如何为项目添加新的 AI 服务提供商支持。
+欢迎为 API Proxy 项目贡献代码！本指南将帮助你了解如何为项目添加新的 AI 服务提供商支持以及如何参与 Tauri 桌面应用开发。
+
+## 🖥️ Tauri 桌面应用开发
+
+### 开发环境设置
+
+1. **安装依赖**
+   ```bash
+   # 使用自动安装脚本
+   ./scripts/install-deps.sh
+   
+   # 或手动安装
+   npm install
+   ```
+
+2. **开发模式**
+   ```bash
+   # 启动开发模式（前端 + 后端 + Tauri）
+   npm run tauri:dev
+   
+   # 仅启动 Node.js 后端
+   npm run dev
+   ```
+
+3. **构建测试**
+   ```bash
+   # 构建调试版本
+   npm run tauri:build:debug
+   
+   # 构建生产版本
+   npm run tauri:build
+   ```
+
+### Tauri 架构说明
+
+本项目采用 Tauri + Node.js 混合架构：
+
+- **前端**: HTML/CSS/JavaScript（位于 `public/` 目录）
+- **Tauri 后端**: Rust 代码（位于 `src-tauri/src/` 目录）
+- **Node.js 服务**: TypeScript 服务器（位于 `src/` 目录）
+
+### 开发工作流
+
+1. **修改前端**: 编辑 `public/` 目录下的文件
+2. **修改 API 逻辑**: 编辑 `src/` 目录下的 TypeScript 文件
+3. **修改 Tauri 功能**: 编辑 `src-tauri/src/` 目录下的 Rust 文件
+4. **测试**: 使用 `npm run tauri:dev` 测试所有组件
+
+### 常见任务
+
+#### 添加新的 Tauri 命令
+
+1. 在 `src-tauri/src/lib.rs` 中定义命令：
+   ```rust
+   #[tauri::command]
+   async fn my_command(param: String) -> Result<String, String> {
+       // 实现逻辑
+       Ok(format!("Hello, {}!", param))
+   }
+   ```
+
+2. 在 `invoke_handler` 中注册：
+   ```rust
+   .invoke_handler(tauri::generate_handler![my_command])
+   ```
+
+3. 在前端调用：
+   ```javascript
+   if (window.__TAURI__) {
+       const result = await window.__TAURI__.tauri.invoke('my_command', { param: 'World' });
+   }
+   ```
+
+#### 配置新的打包目标
+
+编辑 `src-tauri/tauri.conf.json` 中的 `bundle` 配置：
+
+```json
+{
+  "bundle": {
+    "targets": ["deb", "rpm", "appimage", "msi", "dmg"]
+  }
+}
+```
 
 ## 🚀 添加新的 AI 服务提供商
 
