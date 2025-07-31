@@ -17,17 +17,92 @@
     {
       "name": "gpt-4",
       "display_name": "GPT-4",
-      "description": "Most capable model, best for complex tasks"
+      "model_family": "gpt-4",
+      "description": "最先进的大型语言模型，具备强大的推理能力",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": false,
+        "code_generation": true,
+        "multimodal": false,
+        "streaming": true,
+        "context_length": 8192
+      },
+      "pricing": {
+        "input_price": 0.03,
+        "output_price": 0.06,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 2.5,
+        "availability": 99.9
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 3500,
+        "tpm_limit": 40000
+      }
     },
     {
       "name": "gpt-4-turbo",
       "display_name": "GPT-4 Turbo",
-      "description": "Faster and more efficient version of GPT-4"
+      "model_family": "gpt-4",
+      "description": "更快速的GPT-4版本，支持更长的上下文",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": true,
+        "code_generation": true,
+        "multimodal": true,
+        "streaming": true,
+        "context_length": 128000
+      },
+      "pricing": {
+        "input_price": 0.01,
+        "output_price": 0.03,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 1.8,
+        "availability": 99.9
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 5000,
+        "tpm_limit": 80000
+      }
     },
     {
       "name": "gpt-3.5-turbo",
       "display_name": "GPT-3.5 Turbo",
-      "description": "Fast and efficient model for most tasks"
+      "model_family": "gpt-3.5",
+      "description": "快速高效的模型，适合大部分任务",
+      "capabilities": {
+        "reasoning": true,
+        "function_calling": true,
+        "vision": false,
+        "code_generation": true,
+        "multimodal": false,
+        "streaming": true,
+        "context_length": 16385
+      },
+      "pricing": {
+        "input_price": 0.001,
+        "output_price": 0.002,
+        "currency": "USD",
+        "billing_unit": "1K_tokens"
+      },
+      "performance": {
+        "avg_response_time": 1.2,
+        "availability": 99.95
+      },
+      "limits": {
+        "max_tokens": 4096,
+        "rpm_limit": 10000,
+        "tpm_limit": 160000
+      }
     }
   ],
   "headers": {

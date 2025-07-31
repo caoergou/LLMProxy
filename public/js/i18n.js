@@ -15,6 +15,7 @@ class I18n {
                 
                 // Navigation tabs
                 'nav.dashboard': '仪表板',
+                'nav.models': '模型浏览',
                 'nav.providers': '模型供应商',
                 'nav.keys': 'API 密钥',
                 'nav.logs': '调用日志',
@@ -122,6 +123,19 @@ class I18n {
                 'providers.loading': '加载供应商信息中...',
                 'providers.no_providers': '暂无供应商信息',
                 
+                // Models
+                'models.title': '模型浏览',
+                'models.loading': '加载模型信息中...',
+                'models.refresh': '刷新',
+                'models.filters': '筛选条件',
+                'models.clear_filters': '清除筛选',
+                'models.capabilities.reasoning': '推理能力',
+                'models.capabilities.function_calling': '函数调用',
+                'models.capabilities.vision': '视觉理解',
+                'models.capabilities.code_generation': '代码生成',
+                'models.capabilities.multimodal': '多模态',
+                'models.capabilities.streaming': '流式输出',
+                
                 // Language selector
                 'lang.chinese': '中文',
                 'lang.english': 'English'
@@ -133,6 +147,7 @@ class I18n {
                 
                 // Navigation tabs
                 'nav.dashboard': 'Dashboard',
+                'nav.models': 'Model Browser',
                 'nav.providers': 'Model Providers',
                 'nav.keys': 'API Keys',
                 'nav.logs': 'Call Logs',
@@ -239,6 +254,19 @@ class I18n {
                 'providers.title': 'Model Providers',
                 'providers.loading': 'Loading provider information...',
                 'providers.no_providers': 'No provider information available',
+                
+                // Models
+                'models.title': 'Model Browser',
+                'models.loading': 'Loading model information...',
+                'models.refresh': 'Refresh',
+                'models.filters': 'Filters',
+                'models.clear_filters': 'Clear Filters',
+                'models.capabilities.reasoning': 'Reasoning',
+                'models.capabilities.function_calling': 'Function Calling',
+                'models.capabilities.vision': 'Vision',
+                'models.capabilities.code_generation': 'Code Generation',
+                'models.capabilities.multimodal': 'Multimodal',
+                'models.capabilities.streaming': 'Streaming',
                 
                 // Language selector
                 'lang.chinese': '中文',

@@ -4,6 +4,7 @@ import ApiCallModel from '../models/ApiCall';
 import ProxyService from '../services/ProxyService';
 import OpenAIUnifiedService from '../services/OpenAIUnifiedService';
 import ModelRegistry from '../services/ModelRegistry';
+import ModelAggregationService from '../services/ModelAggregationService';
 import Database from '../models/Database';
 import ProviderConfigLoader from '../utils/ProviderConfigLoader';
 import { TimeRange } from '../types';
@@ -293,6 +294,166 @@ router.get('/health', (req: Request, res: Response) => {
         message: 'API Proxy is healthy',
         timestamp: new Date().toISOString()
     });
+});
+
+// ========================================
+// Model-Centric View Endpoints
+// ========================================
+
+// Get models-view - model-centric listing
+router.get('/models-view', async (req: Request, res: Response) => {
+    try {
+        const { 
+            reasoning, 
+            function_calling, 
+            vision, 
+            code_generation, 
+            multimodal, 
+            streaming,
+            min_context_length,
+            search
+        } = req.query;
+
+        let families = ModelAggregationService.getModelFamilies();
+
+        // Apply search filter
+        if (search) {
+            families = ModelAggregationService.searchModelFamilies(search as string);
+        }
+
+        // Apply capability filters
+        const capabilities: Partial<ModelCapabilities> = {};
+        if (reasoning === 'true') capabilities.reasoning = true;
+        if (function_calling === 'true') capabilities.function_calling = true;
+        if (vision === 'true') capabilities.vision = true;
+        if (code_generation === 'true') capabilities.code_generation = true;
+        if (multimodal === 'true') capabilities.multimodal = true;
+        if (streaming === 'true') capabilities.streaming = true;
+        if (min_context_length) capabilities.context_length = parseInt(min_context_length as string);
+
+        if (Object.keys(capabilities).length > 0) {
+            families = ModelAggregationService.filterByCapabilities(capabilities);
+        }
+
+        res.json({ success: true, data: families });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
+// Get specific model family details
+router.get('/models-view/:family', async (req: Request, res: Response) => {
+    try {
+        const family = req.params.family;
+        const familyInfo = ModelAggregationService.getModelFamily(family);
+        
+        if (!familyInfo) {
+            res.status(404).json({ 
+                success: false, 
+                error: `Model family '${family}' not found` 
+            });
+            return;
+        }
+
+        res.json({ success: true, data: familyInfo });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
+// Get providers for a specific model family
+router.get('/models-view/:family/providers', async (req: Request, res: Response) => {
+    try {
+        const family = req.params.family;
+        const { 
+            sort_by = 'price',  // price, performance, availability
+            order = 'asc'       // asc, desc
+        } = req.query;
+
+        const providers = ModelAggregationService.getProvidersForFamily(family);
+        
+        if (providers.length === 0) {
+            res.status(404).json({ 
+                success: false, 
+                error: `No providers found for model family '${family}'` 
+            });
+            return;
+        }
+
+        // Sort providers based on criteria
+        let sortedProviders = [...providers];
+        
+        switch (sort_by) {
+            case 'price':
+                sortedProviders.sort((a, b) => {
+                    const compare = a.pricing.input_price - b.pricing.input_price;
+                    return order === 'desc' ? -compare : compare;
+                });
+                break;
+            case 'performance':
+                sortedProviders.sort((a, b) => {
+                    const compare = a.performance.avg_response_time - b.performance.avg_response_time;
+                    return order === 'desc' ? -compare : compare;
+                });
+                break;
+            case 'availability':
+                sortedProviders.sort((a, b) => {
+                    const compare = a.performance.availability - b.performance.availability;
+                    return order === 'desc' ? -compare : compare;
+                });
+                break;
+        }
+
+        res.json({ 
+            success: true, 
+            data: {
+                family,
+                providers: sortedProviders,
+                sort_by,
+                order
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
+});
+
+// Get best provider recommendation for a model family
+router.get('/models-view/:family/best-provider', async (req: Request, res: Response) => {
+    try {
+        const family = req.params.family;
+        const { 
+            criteria = 'price'  // price, performance, availability
+        } = req.query;
+
+        const criteriaMap = {
+            price: { prioritizePrice: true },
+            performance: { prioritizePerformance: true },
+            availability: { prioritizeAvailability: true }
+        };
+
+        const selectedCriteria = criteriaMap[criteria as keyof typeof criteriaMap] || criteriaMap.price;
+        const bestProvider = ModelAggregationService.getBestProvider(family, selectedCriteria);
+        
+        if (!bestProvider) {
+            res.status(404).json({ 
+                success: false, 
+                error: `No providers found for model family '${family}'` 
+            });
+            return;
+        }
+
+        res.json({ 
+            success: true, 
+            data: {
+                family,
+                recommended_provider: bestProvider,
+                criteria: criteria as string
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: (error as Error).message });
+    }
 });
 
 export default router;
