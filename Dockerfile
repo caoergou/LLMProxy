@@ -13,6 +13,9 @@ RUN npm ci && npm cache clean --force
 # Copy application source code
 COPY . .
 
+# Build TypeScript application
+RUN npm run build
+
 # Create data directory for SQLite database
 RUN mkdir -p data
 

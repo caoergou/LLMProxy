@@ -139,7 +139,7 @@ export interface EndpointUsage {
   total_cost: number;
 }
 
-export type TimeRange = '1h' | '24h' | '7d' | '30d';
+export type TimeRange = "1h" | "24h" | "7d" | "30d";
 
 export interface PerformanceMetrics {
   avg_first_token_latency: number;
@@ -200,4 +200,8 @@ export interface ModelViewResponse {
 export interface ModelFamilyDetailResponse {
   success: boolean;
   data: ModelFamilyInfo;
+}
+
+export interface ModelFamilyWithAvgPrice extends ModelFamilyInfo {
+  avgPrice: number;
 }
