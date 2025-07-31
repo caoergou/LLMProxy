@@ -51,7 +51,7 @@ async function demonstrateUnifiedAPI() {
         });
         console.log();
 
-        // 5. 测试聊天完成请求验证（无 API 密钥，预期失败）
+        // 5. 测试聊天完成请求验证
         console.log('5. 测试请求验证（无模型参数）...');
         try {
             await axios.post(`${BASE_URL}/api/v1/chat/completions`, {
@@ -66,7 +66,7 @@ async function demonstrateUnifiedAPI() {
         }
         console.log();
 
-        // 6. 测试完整的聊天请求（无 API 密钥，预期失败但格式正确）
+        // 6. 测试完整的聊天请求
         console.log('6. 测试完整聊天请求格式...');
         try {
             await axios.post(`${BASE_URL}/api/v1/chat/completions`, {
@@ -114,28 +114,25 @@ async function demonstrateUnifiedAPI() {
     }
 }
 
-// JavaScript 示例：使用 fetch API
+// JavaScript 示例：展示如何使用 OpenAI 客户端库的代码片段
 function showJavaScriptExample() {
     console.log('\n📝 JavaScript 调用示例:');
     console.log('====================');
     console.log(`
-// 使用标准 fetch API
-const response = await fetch('${BASE_URL}/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
-        messages: [
-            { role: 'user', content: 'Hello, world!' }
-        ],
-        max_tokens: 150
-    })
+// 使用标准 OpenAI 客户端库
+import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: 'dummy-key', // API Proxy 不需要真实密钥
+  baseURL: '${BASE_URL}/api/v1'
 });
 
-const data = await response.json();
-console.log(data.choices[0].message.content);
+const completion = await openai.chat.completions.create({
+  messages: [{ role: 'user', content: 'Hello, world!' }],
+  model: 'gpt-3.5-turbo',
+});
+
+console.log(completion.choices[0].message.content);
 `);
 }
 
@@ -144,21 +141,19 @@ function showPythonExample() {
     console.log('\n🐍 Python 调用示例:');
     console.log('==================');
     console.log(`
-import requests
+import openai
 
-response = requests.post('${BASE_URL}/api/v1/chat/completions', 
-    headers={'Content-Type': 'application/json'},
-    json={
-        'model': 'gpt-3.5-turbo',
-        'messages': [
-            {'role': 'user', 'content': 'Hello, world!'}
-        ],
-        'max_tokens': 150
-    }
+openai.api_key = "dummy-key"
+openai.api_base = "${BASE_URL}/api/v1"
+
+response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[
+        {"role": "user", "content": "你好，请用中文回答"}
+    ]
 )
 
-data = response.json()
-print(data['choices'][0]['message']['content'])
+print(response.choices[0].message.content)
 `);
 }
 
