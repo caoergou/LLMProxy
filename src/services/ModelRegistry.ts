@@ -120,11 +120,11 @@ class ModelRegistryService {
   private loadAnthropicModels(): void {
     const anthropicModels: UnifiedModel[] = [
       {
-        openai_id: 'gpt-4', // Map to GPT-4 equivalent
+        openai_id: 'claude-3-opus', // Unique ID for Anthropic model
+        equivalent_to: 'gpt-4', // Map to GPT-4 equivalent
         provider: 'anthropic',
         provider_id: 'claude-3-opus-20240229',
         display_name: 'Claude 3 Opus',
-        description: 'Most powerful model for complex tasks',
         capabilities: {
           supports_chat: true,
           supports_completion: false,

@@ -182,8 +182,10 @@ export class AnthropicFormatAdapter extends BaseFormatAdapter {
 
   private adaptMessages(messages: OpenAIMessage[]): any[] {
     return messages.map(msg => ({
-      role: msg.role === 'system' ? 'user' : msg.role, // Anthropic doesn't have system role
-      content: msg.role === 'system' ? `System: ${msg.content}` : msg.content
+      role: msg.role === 'system' ? 'metadata' : msg.role, // Use a neutral role for system messages
+      content: msg.role === 'system' 
+        ? JSON.stringify({ original_role: 'system', content: msg.content }) // Preserve original role in structured format
+        : msg.content
     }));
   }
 

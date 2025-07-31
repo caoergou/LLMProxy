@@ -116,7 +116,7 @@ router.get('/providers/capabilities', async (req: Request, res: Response) => {
 router.use('/proxy/:provider', async (req: Request, res: Response) => {
     try {
         const provider = req.params.provider;
-        const endpoint = req.url; // This will contain the path after /provider
+        const endpoint = req.path.replace(`/proxy/${provider}`, ''); // Extract the path after /proxy/:provider
         const method = req.method;
         const data = req.body;
         const headers = req.headers as Record<string, string>;
