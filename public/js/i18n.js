@@ -1,145 +1,15 @@
 // Simple i18n implementation
 class I18n {
+    static DEFAULT_LANGUAGE = 'en'; // Set English as default language
+    
     constructor() {
-        this.currentLanguage = localStorage.getItem('language') || 'zh';
+        this.currentLanguage = localStorage.getItem('language') || I18n.DEFAULT_LANGUAGE;
         this.translations = {};
         this.loadTranslations();
     }
 
     loadTranslations() {
         this.translations = {
-            zh: {
-                // Header
-                'app.title': 'API Proxy 管理面板',
-                'app.description': '统一接口管理，集中加密管理多平台 API 密钥，智能选择最优 API',
-                
-                // Navigation tabs
-                'nav.dashboard': '仪表板',
-                'nav.models': '模型浏览',
-                'nav.providers': '模型供应商',
-                'nav.keys': 'API 密钥',
-                'nav.logs': '调用日志',
-                'nav.settings': '设置',
-                
-                // Dashboard
-                'dashboard.recent_calls': '最近调用',
-                'dashboard.loading_stats': '加载统计数据中...',
-                'dashboard.loading_calls': '加载最近调用记录中...',
-                'dashboard.no_data': '暂无统计数据',
-                'dashboard.no_calls': '暂无调用记录',
-                'dashboard.hourly_requests': '每小时请求量',
-                'dashboard.token_usage': 'Token 使用统计',
-                'dashboard.performance_metrics': '性能指标',
-                'dashboard.cost_analysis': '成本分析',
-                'dashboard.requests': '请求数',
-                'dashboard.avg_response_time': '平均响应时间',
-                'dashboard.first_token_latency': '首字符延迟',
-                'stats.total_calls': '总调用次数',
-                'stats.total_cost': '总成本',
-                'stats.avg_response_time': '平均响应时间',
-                'stats.success_rate': '成功率',
-                
-                // API Keys
-                'keys.title': 'API 密钥管理',
-                'keys.add': '添加密钥',
-                'keys.loading': '加载 API 密钥中...',
-                'keys.no_keys': '暂无 API 密钥',
-                'keys.name': '名称',
-                'keys.provider': '提供商',
-                'keys.cost_per_request': '成本/次',
-                'keys.remaining_quota': '剩余额度',
-                'keys.status': '状态',
-                'keys.actions': '操作',
-                'keys.active': '启用',
-                'keys.inactive': '禁用',
-                'keys.edit': '编辑',
-                'keys.delete': '删除',
-                'keys.unlimited': '无限制',
-                
-                // Key Modal
-                'modal.add_key': '添加 API 密钥',
-                'modal.edit_key': '编辑 API 密钥',
-                'modal.provider': '提供商',
-                'modal.select_provider': '选择提供商',
-                'modal.key_name': '名称',
-                'modal.key_name_placeholder': '为此密钥命名',
-                'modal.api_key': 'API 密钥',
-                'modal.api_key_placeholder': '输入 API 密钥',
-                'modal.api_secret': 'API Secret',
-                'modal.api_secret_placeholder': '输入 API Secret（如需要）',
-                'modal.base_url': '基础 URL',
-                'modal.base_url_placeholder': 'API 基础地址',
-                'modal.cost_per_request': '每次调用成本',
-                'modal.remaining_quota': '剩余额度',
-                'modal.remaining_quota_placeholder': '-1 表示无限制',
-                'modal.total_quota': '总额度',
-                'modal.total_quota_placeholder': '-1 表示无限制',
-                'modal.enable_key': '启用此密钥',
-                'modal.cancel': '取消',
-                'modal.save': '保存',
-                
-                // Logs
-                'logs.title': '调用日志',
-                'logs.time_range.1h': '最近 1 小时',
-                'logs.time_range.24h': '最近 24 小时',
-                'logs.time_range.7d': '最近 7 天',
-                'logs.time_range.30d': '最近 30 天',
-                'logs.loading': '加载调用日志中...',
-                'logs.time': '时间',
-                'logs.provider': '提供商',
-                'logs.api_name': 'API 名称',
-                'logs.endpoint': '端点',
-                'logs.status': '状态',
-                'logs.response_time': '响应时间',
-                'logs.cost': '成本',
-                
-                // Settings
-                'settings.title': '系统设置',
-                'settings.server_port': '服务端口',
-                'settings.server_port_note': '重启服务生效',
-                'settings.encryption_key': '加密密钥',
-                'settings.encryption_key_placeholder': '用于加密存储的密钥',
-                'settings.encryption_key_note': '修改后需要重新配置所有 API 密钥',
-                'settings.usage_title': '使用说明',
-                'settings.unified_api': '统一接口调用：',
-                'settings.unified_api_note': '支持的 provider: openai, anthropic, azure',
-                'settings.proxy_api': '直接代理调用：',
-                'settings.proxy_api_note': '自动选择最优 API 密钥，支持格式转换',
-                'settings.language': '语言',
-                
-                // Messages
-                'msg.loading_stats_failed': '加载统计数据失败',
-                'msg.loading_keys_failed': '加载 API 密钥失败',
-                'msg.loading_calls_failed': '加载调用日志失败',
-                'msg.loading_providers_failed': '加载供应商信息失败',
-                'msg.key_added': 'API 密钥添加成功',
-                'msg.key_updated': 'API 密钥更新成功',
-                'msg.key_deleted': 'API 密钥删除成功',
-                'msg.operation_failed': '操作失败',
-                'msg.delete_confirm': '确定要删除这个 API 密钥吗？',
-                
-                // Providers
-                'providers.title': '模型供应商',
-                'providers.loading': '加载供应商信息中...',
-                'providers.no_providers': '暂无供应商信息',
-                
-                // Models
-                'models.title': '模型浏览',
-                'models.loading': '加载模型信息中...',
-                'models.refresh': '刷新',
-                'models.filters': '筛选条件',
-                'models.clear_filters': '清除筛选',
-                'models.capabilities.reasoning': '推理能力',
-                'models.capabilities.function_calling': '函数调用',
-                'models.capabilities.vision': '视觉理解',
-                'models.capabilities.code_generation': '代码生成',
-                'models.capabilities.multimodal': '多模态',
-                'models.capabilities.streaming': '流式输出',
-                
-                // Language selector
-                'lang.chinese': '中文',
-                'lang.english': 'English'
-            },
             en: {
                 // Header
                 'app.title': 'API Proxy Management Panel',
@@ -267,6 +137,138 @@ class I18n {
                 'models.capabilities.code_generation': 'Code Generation',
                 'models.capabilities.multimodal': 'Multimodal',
                 'models.capabilities.streaming': 'Streaming',
+                
+                // Language selector
+                'lang.chinese': '中文',
+                'lang.english': 'English'
+            },
+            zh: {
+                // Header
+                'app.title': 'API Proxy 管理面板',
+                'app.description': '统一接口管理，集中加密管理多平台 API 密钥，智能选择最优 API',
+                
+                // Navigation tabs
+                'nav.dashboard': '仪表板',
+                'nav.models': '模型浏览',
+                'nav.providers': '模型供应商',
+                'nav.keys': 'API 密钥',
+                'nav.logs': '调用日志',
+                'nav.settings': '设置',
+                
+                // Dashboard
+                'dashboard.recent_calls': '最近调用',
+                'dashboard.loading_stats': '加载统计数据中...',
+                'dashboard.loading_calls': '加载最近调用记录中...',
+                'dashboard.no_data': '暂无统计数据',
+                'dashboard.no_calls': '暂无调用记录',
+                'dashboard.hourly_requests': '每小时请求量',
+                'dashboard.token_usage': 'Token 使用统计',
+                'dashboard.performance_metrics': '性能指标',
+                'dashboard.cost_analysis': '成本分析',
+                'dashboard.requests': '请求数',
+                'dashboard.avg_response_time': '平均响应时间',
+                'dashboard.first_token_latency': '首字符延迟',
+                'stats.total_calls': '总调用次数',
+                'stats.total_cost': '总成本',
+                'stats.avg_response_time': '平均响应时间',
+                'stats.success_rate': '成功率',
+                
+                // API Keys
+                'keys.title': 'API 密钥管理',
+                'keys.add': '添加密钥',
+                'keys.loading': '加载 API 密钥中...',
+                'keys.no_keys': '暂无 API 密钥',
+                'keys.name': '名称',
+                'keys.provider': '提供商',
+                'keys.cost_per_request': '成本/次',
+                'keys.remaining_quota': '剩余额度',
+                'keys.status': '状态',
+                'keys.actions': '操作',
+                'keys.active': '启用',
+                'keys.inactive': '禁用',
+                'keys.edit': '编辑',
+                'keys.delete': '删除',
+                'keys.unlimited': '无限制',
+                
+                // Key Modal
+                'modal.add_key': '添加 API 密钥',
+                'modal.edit_key': '编辑 API 密钥',
+                'modal.provider': '提供商',
+                'modal.select_provider': '选择提供商',
+                'modal.key_name': '名称',
+                'modal.key_name_placeholder': '为此密钥命名',
+                'modal.api_key': 'API 密钥',
+                'modal.api_key_placeholder': '输入 API 密钥',
+                'modal.api_secret': 'API Secret',
+                'modal.api_secret_placeholder': '输入 API Secret（如需要）',
+                'modal.base_url': '基础 URL',
+                'modal.base_url_placeholder': 'API 基础地址',
+                'modal.cost_per_request': '每次调用成本',
+                'modal.remaining_quota': '剩余额度',
+                'modal.remaining_quota_placeholder': '-1 表示无限制',
+                'modal.total_quota': '总额度',
+                'modal.total_quota_placeholder': '-1 表示无限制',
+                'modal.enable_key': '启用此密钥',
+                'modal.cancel': '取消',
+                'modal.save': '保存',
+                
+                // Logs
+                'logs.title': '调用日志',
+                'logs.time_range.1h': '最近 1 小时',
+                'logs.time_range.24h': '最近 24 小时',
+                'logs.time_range.7d': '最近 7 天',
+                'logs.time_range.30d': '最近 30 天',
+                'logs.loading': '加载调用日志中...',
+                'logs.time': '时间',
+                'logs.provider': '提供商',
+                'logs.api_name': 'API 名称',
+                'logs.endpoint': '端点',
+                'logs.status': '状态',
+                'logs.response_time': '响应时间',
+                'logs.cost': '成本',
+                
+                // Settings
+                'settings.title': '系统设置',
+                'settings.server_port': '服务端口',
+                'settings.server_port_note': '重启服务生效',
+                'settings.encryption_key': '加密密钥',
+                'settings.encryption_key_placeholder': '用于加密存储的密钥',
+                'settings.encryption_key_note': '修改后需要重新配置所有 API 密钥',
+                'settings.usage_title': '使用说明',
+                'settings.unified_api': '统一接口调用：',
+                'settings.unified_api_note': '支持的 provider: openai, anthropic, azure',
+                'settings.proxy_api': '直接代理调用：',
+                'settings.proxy_api_note': '自动选择最优 API 密钥，支持格式转换',
+                'settings.language': '语言',
+                
+                // Messages
+                'msg.loading_stats_failed': '加载统计数据失败',
+                'msg.loading_keys_failed': '加载 API 密钥失败',
+                'msg.loading_calls_failed': '加载调用日志失败',
+                'msg.loading_providers_failed': '加载供应商信息失败',
+                'msg.key_added': 'API 密钥添加成功',
+                'msg.key_updated': 'API 密钥更新成功',
+                'msg.key_deleted': 'API 密钥删除成功',
+                'msg.operation_failed': '操作失败',
+                'msg.delete_confirm': '确定要删除这个 API 密钥吗？',
+                
+                // Providers
+                'providers.title': '模型供应商',
+                'providers.loading': '加载供应商信息中...',
+                'providers.no_providers': '暂无供应商信息',
+                
+                // Models
+                'models.title': '模型浏览',
+                'models.loading': '加载模型信息中...',
+                'models.refresh': '刷新',
+                'models.filters': '筛选条件',
+                'models.clear_filters': '清除筛选',
+                'models.capabilities.reasoning': '推理能力',
+                'models.capabilities.function_calling': '函数调用',
+                'models.capabilities.vision': '视觉理解',
+                'models.capabilities.code_generation': '代码生成',
+                'models.capabilities.multimodal': '多模态',
+                'models.capabilities.streaming': '流式输出',
                 
                 // Language selector
                 'lang.chinese': '中文',
