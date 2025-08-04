@@ -95,11 +95,11 @@ async fn check_server_status() -> Result<bool, String> {
 async fn restart_server(app_handle: AppHandle, node_server: State<'_, NodeServer>) -> Result<(), String> {
     info!("Restarting Node.js server...");
     node_server.stop();
-    thread::sleep(Duration::from_secs(2));
+    time::sleep(Duration::from_secs(2)).await;
     node_server.start(&app_handle)?;
     
     // Wait a bit for the server to start
-    thread::sleep(Duration::from_secs(3));
+    time::sleep(Duration::from_secs(3)).await;
     Ok(())
 }
 
