@@ -1,21 +1,21 @@
-# Contributing Guide
+# 贡献指南
 
-> **English Documentation** | [中文文档](CONTRIBUTING_cn.md)
+> [English Documentation](CONTRIBUTING.md) | **中文文档**
 
-Welcome to contribute to the API Proxy project! This guide will help you understand how to add support for new AI service providers to the project.
+欢迎为 API Proxy 项目贡献代码！本指南将帮助你了解如何为项目添加新的 AI 服务提供商支持。
 
-## 🚀 Adding New AI Service Providers
+## 🚀 添加新的 AI 服务提供商
 
-### 1. Create Provider Configuration File
+### 1. 创建提供商配置文件
 
-Create a new JSON configuration file in the `configs/providers/` directory:
+在 `configs/providers/` 目录下创建新的 JSON 配置文件：
 
 ```json
 {
   "provider": "provider_id",
   "name": "Provider Name",
-  "display_name": "Display Name",
-  "description": "Brief description",
+  "display_name": "显示名称",
+  "description": "简短描述",
   "base_url": "https://api.provider.com",
   "auth_type": "bearer|header|api-key",
   "request_format": "openai|custom",
@@ -25,8 +25,8 @@ Create a new JSON configuration file in the `configs/providers/` directory:
   "models": [
     {
       "name": "model-name",
-      "display_name": "Model Display Name",
-      "description": "Model description"
+      "display_name": "模型显示名称",
+      "description": "模型描述"
     }
   ],
   "headers": {
@@ -36,42 +36,42 @@ Create a new JSON configuration file in the `configs/providers/` directory:
   "icon": "🤖",
   "website": "https://provider.com",
   "documentation": "https://docs.provider.com",
-  "registration_guide": "Registration guide",
-  "notes": "Usage instructions"
+  "registration_guide": "注册指南",
+  "notes": "使用说明"
 }
 ```
 
-### 2. Configuration Field Description
+### 2. 配置字段说明
 
-| Field | Required | Description |
-|-------|----------|-------------|
-| `provider` | ✓ | Provider unique identifier |
-| `name` | ✓ | Provider name |
-| `display_name` | ✓ | Frontend display name |
-| `base_url` | ✓ | API base URL |
-| `auth_type` | ✓ | Authentication type |
-| `request_format` | ✓ | Request format |
-| `response_format` | ✓ | Response format |
-| `models` | ✓ | Supported model list |
-| `headers` | ✓ | Request header template |
+| 字段 | 必需 | 说明 |
+|------|------|------|
+| `provider` | ✓ | 提供商唯一标识符 |
+| `name` | ✓ | 提供商名称 |
+| `display_name` | ✓ | 前端显示名称 |
+| `base_url` | ✓ | API 基础 URL |
+| `auth_type` | ✓ | 认证类型 |
+| `request_format` | ✓ | 请求格式 |
+| `response_format` | ✓ | 响应格式 |
+| `models` | ✓ | 支持的模型列表 |
+| `headers` | ✓ | 请求头模板 |
 
-### 3. Implement Format Adapter (If Needed)
+### 3. 实现格式适配器（如需要）
 
-If the new provider's request/response format is incompatible with OpenAI, you need to add a format adapter in `src/services/ProxyService.js`:
+如果新提供商的请求/响应格式与 OpenAI 不兼容，需要在 `src/services/ProxyService.js` 中添加格式适配器：
 
 ```javascript
-// Add to adapter mapping
+// 在适配器映射中添加
 this.formatAdapters = {
     your_provider: this.adaptYourProviderFormat.bind(this)
 };
 
-// Implement adapter method
+// 实现适配方法
 adaptYourProviderFormat(data, direction) {
     if (direction === 'request') {
-        // Convert OpenAI format to provider format
-        return { /* converted request data */ };
+        // 将 OpenAI 格式转换为提供商格式
+        return { /* 转换后的请求数据 */ };
     } else if (direction === 'response') {
-        // Convert provider response to OpenAI format
+        // 将提供商响应转换为 OpenAI 格式
         return {
             id: data.id,
             object: 'chat.completion',
@@ -91,31 +91,31 @@ adaptYourProviderFormat(data, direction) {
 }
 ```
 
-### 4. Test Configuration
+### 4. 测试配置
 
-1. Start service: `npm start`
-2. Visit http://localhost:3000/api/providers to confirm new provider is loaded
-3. Add new provider's API key in management interface
-4. Test API call functionality
+1. 启动服务：`npm start`
+2. 访问 http://localhost:3000/api/providers 确认新提供商已加载
+3. 在管理界面添加新提供商的 API 密钥
+4. 测试 API 调用功能
 
-### 5. Submit Pull Request
+### 5. 提交 Pull Request
 
-1. Fork the project to your GitHub account
-2. Create a feature branch: `git checkout -b feature/add-provider-xxx`
-3. Commit your changes: `git commit -am 'Add support for XXX provider'`
-4. Push to branch: `git push origin feature/add-provider-xxx`
-5. Create Pull Request
+1. Fork 项目到你的 GitHub 账户
+2. 创建功能分支：`git checkout -b feature/add-provider-xxx`
+3. 提交你的更改：`git commit -am 'Add support for XXX provider'`
+4. 推送到分支：`git push origin feature/add-provider-xxx`
+5. 创建 Pull Request
 
-#### PR Requirements
+#### PR 要求
 
-- [ ] Added complete provider configuration file
-- [ ] Added format adapter if necessary
-- [ ] Tested basic functionality
-- [ ] Updated supported provider list in README.md
+- [ ] 添加了完整的提供商配置文件
+- [ ] 如有必要，添加了格式适配器
+- [ ] 测试了基本功能
+- [ ] 更新了 README.md 中的支持提供商列表
 
-## 📝 Example: Adding Cohere Support
+## 📝 示例：添加 Cohere 支持
 
-### Create `configs/providers/cohere.json`
+### 创建 `configs/providers/cohere.json`
 
 ```json
 {
@@ -143,12 +143,12 @@ adaptYourProviderFormat(data, direction) {
   "icon": "🎯",
   "website": "https://cohere.com",
   "documentation": "https://docs.cohere.com/",
-  "registration_guide": "Visit Cohere Console to register account and get API key",
-  "notes": "Supports enterprise-grade large language model services"
+  "registration_guide": "访问 Cohere Console 注册账户并获取 API 密钥",
+  "notes": "支持企业级大语言模型服务"
 }
 ```
 
-### Add Format Adapter
+### 添加格式适配器
 
 ```javascript
 adaptCohereFormat(data, direction) {
@@ -184,38 +184,38 @@ adaptCohereFormat(data, direction) {
 }
 ```
 
-## 🛠️ Development Environment Setup
+## 🛠️ 开发环境设置
 
 ```bash
-# Clone project
+# 克隆项目
 git clone https://github.com/caoergou/api-proxy.git
 cd api-proxy
 
-# Install dependencies
+# 安装依赖
 npm install
 
-# Configure environment
+# 配置环境
 cp .env.example .env
 
-# Start development server
+# 启动开发服务器
 npm start
 ```
 
-## 📋 Code Standards
+## 📋 代码规范
 
-- Use TypeScript/JavaScript ES6+ syntax
-- Maintain consistent code comments
-- Follow existing code style
-- Ensure configuration file format is correct (JSON validity)
+- 使用 TypeScript/JavaScript ES6+ 语法
+- 保持代码注释的一致性
+- 遵循现有的代码风格
+- 确保配置文件格式正确（JSON 有效性）
 
-## 🐛 Report Issues
+## 🐛 报告问题
 
-If you find bugs or have feature suggestions, please report them through [GitHub Issues](https://github.com/caoergou/api-proxy/issues).
+发现 bug 或有功能建议，请通过 [GitHub Issues](https://github.com/caoergou/api-proxy/issues) 报告。
 
-## 📄 License
+## 📄 许可证
 
-By contributing code, you agree that your contributions will be released under the MIT License.
+通过贡献代码，你同意你的贡献将在 MIT 许可证下发布。
 
 ---
 
-Thank you for your contribution! 🎉
+感谢你的贡献！🎉
