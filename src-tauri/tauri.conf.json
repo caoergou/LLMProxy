@@ -1,8 +1,8 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "API Proxy",
+  "productName": "LLM Proxy",
   "version": "1.0.0",
-  "identifier": "com.caoergou.api-proxy",
+  "identifier": "com.caoergou.llm-proxy",
   "build": {
     "frontendDist": "../public",
     "beforeDevCommand": "npm run tauri:dev"
@@ -10,7 +10,7 @@
   "app": {
     "windows": [
       {
-        "title": "API Proxy 管理面板",
+        "title": "LLM Proxy 管理面板",
         "width": 1200,
         "height": 800,
         "resizable": true,
@@ -35,7 +35,7 @@
       "icons/icon.ico"
     ],
     "category": "DeveloperTool",
-    "shortDescription": "AI API Proxy and Management Tool",
+    "shortDescription": "LLM Proxy and Management Tool",
     "longDescription": "A lightweight local service that provides unified interface for client calls, centrally manages encrypted API keys from multiple platforms, tracks API pricing and remaining quotas.",
     "copyright": "Copyright (c) 2024 caoergou",
     "resources": [
