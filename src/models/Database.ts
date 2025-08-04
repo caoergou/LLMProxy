@@ -11,7 +11,6 @@ class Database {
         
         // Ensure directory exists
         const dbDir = path.dirname(dbPath);
-        const fs = require('fs');
         if (!fs.existsSync(dbDir)) {
             fs.mkdirSync(dbDir, { recursive: true });
         }
