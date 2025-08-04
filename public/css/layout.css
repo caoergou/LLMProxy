@@ -84,10 +84,67 @@ body {
     font-size: 0.875rem;
     cursor: pointer;
     transition: all var(--transition);
+    z-index: 1000;
 }
 
 .language-selector:hover {
     border-color: var(--accent-primary);
+}
+
+/* Theme Toggle */
+.theme-toggle {
+    position: absolute;
+    top: var(--space-lg);
+    right: var(--space-lg);
+    width: 50px;
+    height: 28px;
+    background: var(--bg-tertiary);
+    border-radius: 14px;
+    border: 1px solid var(--border-primary);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2px;
+    box-shadow: var(--shadow-light);
+    z-index: 1000;
+}
+
+.theme-toggle:hover {
+    background: var(--bg-accent);
+}
+
+.theme-toggle::before {
+    content: '☀️';
+    font-size: 12px;
+    margin-left: 2px;
+}
+
+.theme-toggle::after {
+    content: '🌙';
+    font-size: 12px;
+    margin-right: 2px;
+}
+
+.theme-toggle-ball {
+    width: 20px;
+    height: 20px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    position: absolute;
+    left: 3px;
+    transition: all var(--transition);
+    box-shadow: var(--shadow-light);
+}
+
+[data-theme="dark"] .theme-toggle {
+    background: var(--accent-primary);
+}
+
+[data-theme="dark"] .theme-toggle-ball {
+    left: 26px;
+    background: var(--bg-primary);
 }
 
 /* Main Content Area */
@@ -97,6 +154,28 @@ body {
     box-shadow: var(--shadow-light);
     border: 1px solid var(--border-primary);
     overflow: hidden;
+}
+
+/* Tab content */
+.tab-content {
+    display: none;
+    padding: var(--space-lg);
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Empty State */
@@ -114,4 +193,31 @@ body {
 
 .empty-state p {
     font-size: 0.875rem;
+}
+
+/* Dashboard */
+.dashboard-grid {
+    display: grid;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+/* Table container for responsive tables */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-primary);
+}
+
+/* Checkbox group enhancement */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    font-size: 0.875rem;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin: 0;
 }

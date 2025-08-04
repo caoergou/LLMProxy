@@ -225,118 +225,132 @@
                                 <span data-i18n="models.capabilities.multimodal">多模态</span>
                             </label>
                             <label class="checkbox-group">
-                        <input type="checkbox" id="filter_streaming" onchange="applyModelFilters()">
-                        <span data-i18n="models.capabilities.streaming">流式输出</span>
-                    </label>
-                </div>
-                <div style="margin-top: 10px;">
-                    <button class="btn btn-secondary" onclick="clearModelFilters()" style="font-size: 12px; padding: 6px 12px;" data-i18n="models.clear_filters">清除筛选</button>
-                </div>
-            </div>
+                                <input type="checkbox" id="filter_streaming" onchange="applyModelFilters()">
+                                <span data-i18n="models.capabilities.streaming">流式输出</span>
+                            </label>
+                        </div>
+                        <div style="margin-top: var(--space-md);">
+                            <button class="btn btn-secondary" onclick="clearModelFilters()" data-i18n="models.clear_filters">清除筛选</button>
+                        </div>
+                    </div>
 
-            <div id="modelsContainer">
-                <div class="loading" data-i18n="models.loading">加载模型信息中...</div>
-            </div>
-        </div>
-
-        <!-- Providers Tab -->
-        <div id="providers" class="tab-content">
-            <h3 style="margin-bottom: 20px;" data-i18n="providers.title">模型供应商</h3>
-            <div id="providersContainer">
-                <div class="loading" data-i18n="providers.loading">加载供应商信息中...</div>
-            </div>
-        </div>
-
-        <!-- API Keys Tab -->
-        <div id="keys" class="tab-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 data-i18n="keys.title">API 密钥管理</h3>
-                <button class="btn" onclick="showAddKeyModal()" data-i18n="keys.add">添加密钥</button>
-            </div>
-
-            <div id="apiKeysTable">
-                <div class="loading" data-i18n="keys.loading">加载 API 密钥中...</div>
-            </div>
-        </div>
-
-        <!-- Logs Tab -->
-        <div id="logs" class="tab-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h3 data-i18n="logs.title">调用日志</h3>
-                <select id="timeRange" onchange="loadStats(); loadRecentCalls();">
-                    <option value="1h" data-i18n="logs.time_range.1h">最近 1 小时</option>
-                    <option value="24h" selected data-i18n="logs.time_range.24h">最近 24 小时</option>
-                    <option value="7d" data-i18n="logs.time_range.7d">最近 7 天</option>
-                    <option value="30d" data-i18n="logs.time_range.30d">最近 30 天</option>
-                </select>
-            </div>
-
-            <div id="callsTable">
-                <div class="loading" data-i18n="logs.loading">加载调用日志中...</div>
-            </div>
-        </div>
-
-        <!-- Settings Tab -->
-        <div id="settings" class="tab-content">
-            <h3 style="margin-bottom: 20px;" data-i18n="settings.title">系统设置</h3>
-
-            <div class="form-group">
-                <label data-i18n="settings.language">语言</label>
-                <select id="settingsLanguageSelect" onchange="changeLanguage(this.value)">
-                    <option value="zh" data-i18n="lang.chinese">中文</option>
-                    <option value="en" data-i18n="lang.english">English</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="settings.server_port">服务端口</label>
-                <input type="number" id="serverPort" value="3000" readonly>
-                <small style="color: #6b7280;" data-i18n="settings.server_port_note">重启服务生效</small>
-            </div>
-
-            <div class="form-group">
-                <label data-i18n="settings.encryption_key">加密密钥</label>
-                <input type="password" id="encryptionKey" data-i18n-placeholder="settings.encryption_key_placeholder" placeholder="用于加密存储的密钥">
-                <small style="color: #6b7280;" data-i18n="settings.encryption_key_note">修改后需要重新配置所有 API 密钥</small>
-            </div>
-
-            <div class="form-group">
-                <h4 style="margin-bottom: 10px;" data-i18n="settings.usage_title">使用说明</h4>
-                <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; line-height: 1.6;">
-                    <p><strong data-i18n="settings.unified_api">统一接口调用：</strong></p>
-                    <p>POST <code>http://localhost:3000/api/chat/completions?provider=openai</code></p>
-                    <p data-i18n="settings.unified_api_note">支持的 provider: openai, anthropic, azure</p>
-                    <br>
-                    <p><strong data-i18n="settings.proxy_api">直接代理调用：</strong></p>
-                    <p>POST <code>http://localhost:3000/api/proxy/openai/chat/completions</code></p>
-                    <p data-i18n="settings.proxy_api_note">自动选择最优 API 密钥，支持格式转换</p>
+                    <div id="modelsContainer" class="empty-state">
+                        <p data-i18n="models.loading">加载模型信息中...</p>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- Providers Tab -->
+            <div id="providers" class="tab-content">
+                <div class="card">
+                    <h3 class="card-title" data-i18n="providers.title">模型供应商</h3>
+                    <div id="providersContainer" class="empty-state">
+                        <p data-i18n="providers.loading">加载供应商信息中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Keys Tab -->
+            <div id="keys" class="tab-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+                        <h3 class="card-title" data-i18n="keys.title">API 密钥管理</h3>
+                        <button class="btn btn-primary" onclick="showAddKeyModal()" data-i18n="keys.add">添加密钥</button>
+                    </div>
+
+                    <div id="apiKeysTable" class="table-container">
+                        <div class="empty-state">
+                            <p data-i18n="keys.loading">加载 API 密钥中...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Logs Tab -->
+            <div id="logs" class="tab-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg);">
+                        <h3 class="card-title" data-i18n="logs.title">调用日志</h3>
+                        <select class="form-select" id="timeRange" onchange="loadStats(); loadRecentCalls();" style="width: auto;">
+                            <option value="1h" data-i18n="logs.time_range.1h">最近 1 小时</option>
+                            <option value="24h" selected data-i18n="logs.time_range.24h">最近 24 小时</option>
+                            <option value="7d" data-i18n="logs.time_range.7d">最近 7 天</option>
+                            <option value="30d" data-i18n="logs.time_range.30d">最近 30 天</option>
+                        </select>
+                    </div>
+
+                    <div id="callsTable" class="table-container">
+                        <div class="empty-state">
+                            <p data-i18n="logs.loading">加载调用日志中...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings" class="tab-content">
+                <div class="card">
+                    <h3 class="card-title" data-i18n="settings.title">系统设置</h3>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="settings.language">语言</label>
+                        <select class="form-select" id="settingsLanguageSelect" onchange="changeLanguage(this.value)">
+                            <option value="zh" data-i18n="lang.chinese">中文</option>
+                            <option value="en" data-i18n="lang.english">English</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="settings.server_port">服务端口</label>
+                        <input type="number" class="form-input" id="serverPort" value="3000" readonly>
+                        <small style="color: var(--text-muted);" data-i18n="settings.server_port_note">重启服务生效</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="settings.encryption_key">加密密钥</label>
+                        <input type="password" class="form-input" id="encryptionKey" data-i18n-placeholder="settings.encryption_key_placeholder" placeholder="用于加密存储的密钥">
+                        <small style="color: var(--text-muted);" data-i18n="settings.encryption_key_note">修改后需要重新配置所有 API 密钥</small>
+                    </div>
+
+                    <div class="form-group">
+                        <h4 class="card-title" data-i18n="settings.usage_title">使用说明</h4>
+                        <div class="card" style="background: var(--bg-tertiary);">
+                            <p><strong data-i18n="settings.unified_api">统一接口调用：</strong></p>
+                            <p>POST <code>http://localhost:3000/api/chat/completions?provider=openai</code></p>
+                            <p data-i18n="settings.unified_api_note">支持的 provider: openai, anthropic, azure</p>
+                            <br>
+                            <p><strong data-i18n="settings.proxy_api">直接代理调用：</strong></p>
+                            <p>POST <code>http://localhost:3000/api/proxy/openai/chat/completions</code></p>
+                            <p data-i18n="settings.proxy_api_note">自动选择最优 API 密钥，支持格式转换</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
 
     <!-- Add/Edit API Key Modal -->
     <div id="keyModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="modalTitle" data-i18n="modal.add_key">添加 API 密钥</h3>
-                <button class="close" onclick="closeKeyModal()">&times;</button>
+                <h3 class="modal-title" id="modalTitle" data-i18n="modal.add_key">添加 API 密钥</h3>
+                <button class="modal-close" onclick="closeKeyModal()">&times;</button>
             </div>
 
             <form id="keyForm">
                 <input type="hidden" id="keyId">
 
                 <div class="form-group">
-                    <label data-i18n="modal.provider">提供商</label>
-                    <select id="provider" onchange="updateProviderFields()" required>
+                    <label class="form-label" data-i18n="modal.provider">提供商</label>
+                    <select class="form-select" id="provider" onchange="updateProviderFields()" required>
                         <option value="">选择提供商</option>
                         <!-- Options will be loaded dynamically -->
                     </select>
                 </div>
 
                 <div class="form-group">
-                    <label data-i18n="modal.key_name">名称</label>
-                    <input type="text" id="keyName" required data-i18n-placeholder="modal.key_name_placeholder" placeholder="为此密钥命名">
+                    <label class="form-label" data-i18n="modal.key_name">名称</label>
+                    <input type="text" class="form-input" id="keyName" required data-i18n-placeholder="modal.key_name_placeholder" placeholder="为此密钥命名">
                 </div>
 
                 <div class="form-group">

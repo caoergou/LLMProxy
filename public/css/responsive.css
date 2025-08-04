@@ -29,25 +29,28 @@
         border-right: none;
         border-bottom: 1px solid var(--border-primary);
         padding: var(--space-md);
+        text-align: center;
     }
     
     .tab:last-child {
         border-bottom: none;
     }
     
-    /* Adjust theme toggle and language selector */
+    /* Adjust theme toggle and language selector for mobile */
     .theme-toggle {
-        position: static;
-        margin: var(--space-md) auto 0;
-        display: flex;
-        justify-content: center;
+        position: fixed;
+        top: var(--space-md);
+        right: var(--space-md);
+        z-index: 1001;
     }
     
     .language-selector {
-        position: static;
-        margin: var(--space-md) auto;
-        display: block;
-        width: fit-content;
+        position: fixed;
+        top: var(--space-md);
+        right: 4rem;
+        z-index: 1001;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.75rem;
     }
     
     /* Modal adjustments */
@@ -89,6 +92,11 @@
     .dashboard-grid {
         grid-template-columns: 1fr;
         gap: var(--space-md);
+    }
+
+    /* Content area adjustments */
+    .content {
+        margin-top: var(--space-xl);
     }
 }
 
