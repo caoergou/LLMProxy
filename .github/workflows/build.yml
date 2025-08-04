@@ -96,6 +96,13 @@ jobs:
       - name: Build Tauri application
         run: npm run tauri:build -- --target ${{ matrix.target }}
 
+      - name: Debug build output structure
+        run: |
+          echo "=== Build output structure ==="
+          find src-tauri/target/${{ matrix.target }}/release/bundle -type f -name "*.*" 2>/dev/null || echo "No bundle directory found"
+          echo "=== Full target directory structure ==="
+          ls -la src-tauri/target/${{ matrix.target }}/release/ 2>/dev/null || echo "No release directory found"
+
       - name: Upload artifacts (Windows)
         if: matrix.platform == 'windows'
         uses: actions/upload-artifact@v4
@@ -136,7 +143,11 @@ jobs:
           path: artifacts
 
       - name: Display structure of downloaded files
-        run: ls -R artifacts
+        run: |
+          echo "=== Downloaded artifacts structure ==="
+          ls -R artifacts
+          echo "=== Available files for release ==="
+          find artifacts -type f \( -name "*.msi" -o -name "*.exe" -o -name "*.dmg" -o -name "*.deb" -o -name "*.AppImage" \) 2>/dev/null || echo "No release files found"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
@@ -150,5 +161,6 @@ jobs:
           draft: false
           prerelease: false
           generate_release_notes: true
+          fail_on_unmatched_files: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
