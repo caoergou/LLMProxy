@@ -1,0 +1,20 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions
+    url: https://github.com/caoergou/LLMProxy/discussions
+    about: Ask questions and discuss with the community
+  - name: 📚 Documentation
+    url: https://github.com/caoergou/LLMProxy/blob/main/README.md
+    about: Read the project documentation
+  - name: 📚 中文文档
+    url: https://github.com/caoergou/LLMProxy/blob/main/README_cn.md
+    about: 阅读项目中文文档
+  - name: 🤝 Contributing Guide
+    url: https://github.com/caoergou/LLMProxy/blob/main/CONTRIBUTING.md
+    about: Learn how to contribute to the project
+  - name: 🤝 贡献指南
+    url: https://github.com/caoergou/LLMProxy/blob/main/CONTRIBUTING_cn.md
+    about: 了解如何为项目做贡献
+  - name: 🚀 Adding Providers Guide
+    url: https://github.com/caoergou/LLMProxy/blob/main/docs/ADDING_PROVIDERS.md
+    about: Learn about the automated provider request system

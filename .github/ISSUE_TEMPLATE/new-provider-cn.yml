@@ -1,0 +1,204 @@
+name: 🚀 新增AI服务商请求
+description: 请求添加新的AI服务提供商支持
+title: "[服务商请求] 添加 支持"
+labels: ["enhancement", "provider-request"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢您花时间请求新的AI服务商！请填写以下信息以帮助我们添加对您请求的服务商的支持。
+        
+        📖 **提交前请先检查**: 请查看[现有服务商](https://github.com/caoergou/LLMProxy/tree/main/configs/providers)确认该服务商尚未支持。
+
+  - type: input
+    id: provider_name
+    attributes:
+      label: 服务商名称
+      description: AI服务提供商的官方名称
+      placeholder: 例如："智谱AI", "百度文心", "阿里通义千问"
+    validations:
+      required: true
+
+  - type: input
+    id: provider_id
+    attributes:
+      label: 服务商ID
+      description: 服务商的唯一标识符（小写，无空格，使用连字符）
+      placeholder: 例如："zhipu", "baidu-wenxin", "alibaba-qwen"
+    validations:
+      required: true
+
+  - type: input
+    id: base_url
+    attributes:
+      label: API基础URL
+      description: 服务商API的基础URL地址
+      placeholder: 例如："https://open.bigmodel.cn/api/paas/v4"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: auth_type
+    attributes:
+      label: 认证方式
+      description: 该服务商如何进行API请求认证？
+      options:
+        - bearer (Authorization: Bearer <token>)
+        - header (自定义请求头)
+        - api-key (API密钥在URL或自定义请求头中)
+        - oauth (OAuth2认证)
+        - other (其他方式)
+    validations:
+      required: true
+
+  - type: textarea
+    id: auth_details
+    attributes:
+      label: 认证详情
+      description: 提供具体的认证详情（请求头名称、格式等）
+      placeholder: 例如："Authorization: Bearer <api_key>" 或 "X-API-Key: <api_key>"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: request_format
+    attributes:
+      label: 请求格式
+      description: 该服务商是否使用OpenAI兼容的请求格式？
+      options:
+        - openai (OpenAI兼容)
+        - custom (自定义格式)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: response_format
+    attributes:
+      label: 响应格式
+      description: 该服务商是否使用OpenAI兼容的响应格式？
+      options:
+        - openai (OpenAI兼容)
+        - custom (自定义格式)
+    validations:
+      required: true
+
+  - type: textarea
+    id: models
+    attributes:
+      label: 可用模型
+      description: 列出该服务商提供的模型（每行一个）
+      placeholder: |
+        glm-4
+        glm-4v
+        glm-3-turbo
+        chatglm-turbo
+    validations:
+      required: true
+
+  - type: textarea
+    id: endpoints
+    attributes:
+      label: 支持的端点
+      description: 列出要支持的API端点（每行一个）
+      placeholder: |
+        /chat/completions
+        /completions
+        /embeddings
+    validations:
+      required: true
+
+  - type: input
+    id: cost_per_request
+    attributes:
+      label: 每次请求成本（美元）
+      description: 每次请求的大致成本（美元，用于价格比较）
+      placeholder: 例如："0.002"
+    validations:
+      required: false
+
+  - type: input
+    id: website
+    attributes:
+      label: 服务商官网
+      description: 官方网站URL
+      placeholder: 例如："https://www.zhipuai.cn"
+    validations:
+      required: true
+
+  - type: input
+    id: documentation
+    attributes:
+      label: API文档URL
+      description: 服务商API文档链接
+      placeholder: 例如："https://open.bigmodel.cn/dev/api"
+    validations:
+      required: true
+
+  - type: input
+    id: console_url
+    attributes:
+      label: 开发者控制台URL
+      description: 服务商开发者控制台/仪表板链接
+      placeholder: 例如："https://open.bigmodel.cn/console"
+    validations:
+      required: false
+
+  - type: textarea
+    id: registration_guide
+    attributes:
+      label: 注册指南
+      description: 如何注册并获取API密钥的简要说明
+      placeholder: "访问服务商官网，创建账户，在API部分生成密钥..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: special_features
+    attributes:
+      label: 特殊功能和能力
+      description: 该服务商提供的任何特殊功能（函数调用、视觉能力、流式响应等）
+      placeholder: |
+        - 支持函数调用
+        - 视觉能力
+        - 流式响应
+        - 长上下文（32k tokens）
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_headers
+    attributes:
+      label: 额外请求头
+      description: API请求所需的任何额外请求头（JSON格式）
+      placeholder: |
+        {
+          "Content-Type": "application/json",
+          "User-Agent": "LLMProxy/1.0"
+        }
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: 附加说明
+      description: 关于该服务商的任何其他重要信息
+      placeholder: "速率限制、特殊要求、定价详情等"
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: 验证确认
+      description: 请确认以下事项
+      options:
+        - label: 我已测试该服务商的API并确认其正常工作
+          required: false
+        - label: 我有该服务商的API访问权限用于测试
+          required: false
+        - label: 我已阅读贡献指南
+          required: true
+        - label: 我理解这是一个请求，实现可能需要时间
+          required: true

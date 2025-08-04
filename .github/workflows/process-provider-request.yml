@@ -1,0 +1,241 @@
+name: Process New Provider Request
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process-provider-request:
+    if: contains(github.event.issue.labels.*.name, 'provider-request')
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Extract issue information
+        id: extract-info
+        run: |
+          # Extract provider ID from issue body for branch naming
+          PROVIDER_ID=$(echo '${{ github.event.issue.body }}' | grep -E "(### Provider ID|### 服务商ID)" -A 1 | tail -1 | tr -d '\r\n' | sed 's/^[[:space:]]*//' | sed 's/[[:space:]]*$//' | head -c 50)
+          
+          # Clean provider ID for branch name (replace spaces and special chars with hyphens)
+          CLEAN_PROVIDER_ID=$(echo "$PROVIDER_ID" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g' | sed 's/--*/-/g' | sed 's/^-\|-$//g')
+          
+          # Fallback if extraction fails
+          if [ -z "$CLEAN_PROVIDER_ID" ] || [ "$CLEAN_PROVIDER_ID" = "-" ]; then
+            CLEAN_PROVIDER_ID="new-provider-${{ github.event.issue.number }}"
+          fi
+          
+          echo "provider_id=$CLEAN_PROVIDER_ID" >> $GITHUB_OUTPUT
+          echo "issue_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+          echo "issue_title=${{ github.event.issue.title }}" >> $GITHUB_OUTPUT
+          
+          # Save issue body to a file to handle special characters properly
+          echo '${{ github.event.issue.body }}' > /tmp/issue_body.txt
+
+      - name: Create feature branch
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "feat/add-provider-${{ steps.extract-info.outputs.provider_id }}"
+
+      - name: Generate provider configuration
+        id: generate-config
+        run: |
+          # Generate the provider configuration
+          node scripts/generate-provider-config.js \
+            "${{ steps.extract-info.outputs.issue_title }}" \
+            "$(cat /tmp/issue_body.txt)" \
+            "./configs/providers"
+          
+          # Check if file was created and get the actual provider ID from the generated config
+          GENERATED_FILES=$(find configs/providers -name "*.json" -newer scripts/generate-provider-config.js 2>/dev/null || true)
+          
+          if [ -n "$GENERATED_FILES" ]; then
+            GENERATED_FILE=$(echo "$GENERATED_FILES" | head -1)
+            ACTUAL_PROVIDER_ID=$(basename "$GENERATED_FILE" .json)
+            echo "config_file=$GENERATED_FILE" >> $GITHUB_OUTPUT
+            echo "actual_provider_id=$ACTUAL_PROVIDER_ID" >> $GITHUB_OUTPUT
+            echo "✅ Generated configuration file: $GENERATED_FILE"
+          else
+            echo "❌ No configuration file was generated"
+            exit 1
+          fi
+
+      - name: Validate configuration
+        id: validate
+        run: |
+          # Validate the generated configuration
+          if node scripts/validate-provider.js "${{ steps.generate-config.outputs.config_file }}" "./configs/providers"; then
+            echo "validation_result=success" >> $GITHUB_OUTPUT
+            echo "✅ Configuration validation passed"
+          else
+            echo "validation_result=failed" >> $GITHUB_OUTPUT
+            echo "❌ Configuration validation failed"
+            exit 1
+          fi
+
+      - name: Update documentation
+        if: steps.validate.outputs.validation_result == 'success'
+        run: |
+          # Add the new provider to the supported providers list in README files
+          PROVIDER_NAME=$(jq -r '.display_name' "${{ steps.generate-config.outputs.config_file }}")
+          PROVIDER_ICON=$(jq -r '.icon // "🤖"' "${{ steps.generate-config.outputs.config_file }}")
+          PROVIDER_WEBSITE=$(jq -r '.website' "${{ steps.generate-config.outputs.config_file }}")
+          
+          # Extract main models for display
+          MAIN_MODELS=$(jq -r '.models[:3] | map(.display_name) | join(", ")' "${{ steps.generate-config.outputs.config_file }}")
+          
+          # Create table row for English README
+          README_EN_ROW="| **$PROVIDER_NAME** | $PROVIDER_ICON | $MAIN_MODELS |"
+          
+          # Add to English README if not already present
+          if ! grep -q "| **$PROVIDER_NAME**" README.md; then
+            # Find the line after Azure OpenAI in the providers table and add the new provider
+            sed -i "/| \*\*Azure OpenAI\*\* |/a\\
+$README_EN_ROW" README.md
+          fi
+          
+          # Add to Chinese README if not already present
+          if ! grep -q "| **$PROVIDER_NAME**" README_cn.md; then
+            sed -i "/| \*\*Azure OpenAI\*\* |/a\\
+$README_EN_ROW" README_cn.md
+          fi
+          
+          echo "✅ Updated documentation with new provider"
+
+      - name: Commit changes
+        if: steps.validate.outputs.validation_result == 'success'
+        run: |
+          git add .
+          git commit -m "feat: add support for ${{ steps.generate-config.outputs.actual_provider_id }} provider
+
+          - Add provider configuration file
+          - Update documentation with new provider
+          - Generated from issue #${{ steps.extract-info.outputs.issue_number }}
+          
+          Closes #${{ steps.extract-info.outputs.issue_number }}"
+
+      - name: Push changes
+        if: steps.validate.outputs.validation_result == 'success'
+        run: |
+          git push origin "feat/add-provider-${{ steps.extract-info.outputs.provider_id }}"
+
+      - name: Create Pull Request
+        if: steps.validate.outputs.validation_result == 'success'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { data: pullRequest } = await github.rest.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `feat: add support for ${{ steps.generate-config.outputs.actual_provider_id }} provider`,
+              head: `feat/add-provider-${{ steps.extract-info.outputs.provider_id }}`,
+              base: 'main',
+              body: `## 🚀 New Provider: ${{ steps.generate-config.outputs.actual_provider_id }}
+
+            This PR adds support for a new AI service provider as requested in issue #${{ steps.extract-info.outputs.issue_number }}.
+
+            ### 📋 Changes Made:
+            - ✅ Added provider configuration file: \`configs/providers/${{ steps.generate-config.outputs.actual_provider_id }}.json\`
+            - ✅ Updated README documentation with new provider
+            - ✅ Configuration validated successfully
+
+            ### 🔍 Configuration Summary:
+            \`\`\`json
+            ${JSON.stringify(require('./configs/providers/${{ steps.generate-config.outputs.actual_provider_id }}.json'), null, 2)}
+            \`\`\`
+
+            ### ✨ Next Steps:
+            1. Review the generated configuration
+            2. Test the provider integration
+            3. Make any necessary adjustments
+            4. Merge when ready
+
+            ---
+            
+            🤖 This PR was automatically generated from issue #${{ steps.extract-info.outputs.issue_number }}
+            
+            Closes #${{ steps.extract-info.outputs.issue_number }}`
+            });
+            
+            console.log(`Created pull request #${pullRequest.number}`);
+
+      - name: Add success comment to issue
+        if: steps.validate.outputs.validation_result == 'success'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.extract-info.outputs.issue_number }},
+              body: `## 🎉 Provider Request Processed Successfully!
+
+            Thank you for your provider request! I've automatically generated a configuration and created a pull request for review.
+
+            ### ✅ What happened:
+            - Generated provider configuration file
+            - Validated the configuration
+            - Updated documentation  
+            - Created pull request for review
+
+            ### 🔍 Next Steps:
+            The pull request will be reviewed by maintainers. You can track the progress and provide additional feedback there.
+
+            ---
+            
+            🤖 This response was automatically generated by the provider request workflow.`
+            });
+
+      - name: Add failure comment to issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ steps.extract-info.outputs.issue_number }},
+              body: `## ❌ Provider Request Processing Failed
+
+            There was an issue processing your provider request. This could be due to:
+
+            - Missing or invalid required information
+            - Configuration validation errors  
+            - Provider already exists
+            - Technical issues with the automation
+
+            ### 🔧 What to do:
+            1. Please review your submission and ensure all required fields are filled
+            2. Check that the provider ID is unique and follows the naming conventions
+            3. Verify that all URLs are valid and accessible
+            4. A maintainer will review this issue and provide guidance
+
+            ### 📋 Required Information Checklist:
+            - [ ] Provider name and unique ID
+            - [ ] Valid API base URL
+            - [ ] Authentication details
+            - [ ] At least one model listed
+            - [ ] Valid website and documentation URLs
+
+            ---
+            
+            🤖 This response was automatically generated. A maintainer will follow up soon.`
+            });
