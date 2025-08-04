@@ -25,6 +25,20 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+          cache-on-failure: true
+
+      - name: Cache APT packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('**/workflows/test.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
       - name: Install Linux dependencies
         run: |
           sudo apt-get update
@@ -40,6 +54,16 @@ jobs:
 
       - name: Install Node.js dependencies
         run: npm ci
+
+      - name: Cache TypeScript build output
+        uses: actions/cache@v4
+        with:
+          path: |
+            dist
+            src-tauri/dist
+          key: ${{ runner.os }}-ts-build-${{ hashFiles('src/**/*', 'tsconfig.json', 'package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-ts-build-
 
       - name: Build TypeScript
         run: npm run build
