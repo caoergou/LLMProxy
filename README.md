@@ -169,6 +169,18 @@ All AI service provider configurations are in the `configs/providers/` directory
 
 - [OpenAI Unified API Guide](docs/UNIFIED_API.md) - Detailed API usage instructions
 - [Contributing Guide](CONTRIBUTING.md) - How to add new AI service providers
+- [Adding Providers Guide](docs/ADDING_PROVIDERS.md) - Automated provider request system
+
+## 🚀 Adding New Providers
+
+LLM Proxy now supports an **automated provider request system**! Simply:
+
+1. Create a [New Provider Request Issue](https://github.com/caoergou/LLMProxy/issues/new/choose)
+2. Fill out the form with provider details
+3. Our automation will validate and create a Pull Request
+4. Review and merge - your provider is ready!
+
+For manual setup, see the [Contributing Guide](CONTRIBUTING.md).
 
 ## 🤝 Contributing
 

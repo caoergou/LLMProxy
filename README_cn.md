@@ -169,6 +169,18 @@ curl -X POST http://localhost:3000/api/v1/chat/completions \
 
 - [OpenAI 统一规范接口指南](docs/UNIFIED_API_cn.md) - 详细 API 使用说明
 - [贡献指南](CONTRIBUTING_cn.md) - 如何添加新的 AI 服务商
+- [添加服务商指南](docs/ADDING_PROVIDERS_cn.md) - 自动化服务商请求系统
+
+## 🚀 添加新服务商
+
+LLM Proxy 现在支持**自动化服务商请求系统**！只需：
+
+1. 创建[新服务商请求Issue](https://github.com/caoergou/LLMProxy/issues/new/choose)
+2. 填写表单提供服务商详情
+3. 我们的自动化系统将验证并创建拉取请求
+4. 审核并合并 - 您的服务商就准备就绪！
+
+如需手动设置，请参阅[贡献指南](CONTRIBUTING_cn.md)。
 
 ## 🤝 贡献
 
