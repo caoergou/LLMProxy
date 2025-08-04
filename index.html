@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">LLM Proxy - Unified AI API Management</title>
+    <meta name="description" content="Lightweight local service providing unified interface for multiple AI providers with encrypted key management and intelligent API selection.">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="assets/css/landing.css">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="nav-logo">🤖</span>
+                <span class="nav-title">LLM Proxy</span>
+            </div>
+            
+            <div class="nav-controls">
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <span class="theme-icon">🌙</span>
+                </button>
+                <select class="lang-select" id="lang-select" aria-label="Select language">
+                    <option value="en">🇺🇸 English</option>
+                    <option value="zh">🇨🇳 中文</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title" id="hero-title">
+                    Unified AI API Management
+                </h1>
+                <p class="hero-subtitle" id="hero-subtitle">
+                    Lightweight local service providing unified interface for multiple AI providers with encrypted key management and intelligent API selection.
+                </p>
+                
+                <div class="hero-buttons">
+                    <a href="#download" class="btn btn-primary" id="btn-download">
+                        <span class="btn-icon">📥</span>
+                        Download
+                    </a>
+                    <a href="#features" class="btn btn-secondary" id="btn-learn-more">
+                        <span class="btn-icon">📖</span>
+                        Learn More
+                    </a>
+                    <a href="https://github.com/caoergou/LLMProxy" class="btn btn-outline" target="_blank">
+                        <span class="btn-icon">⭐</span>
+                        GitHub
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <div class="terminal">
+                        <div class="terminal-header">
+                            <div class="terminal-buttons">
+                                <span class="terminal-btn red"></span>
+                                <span class="terminal-btn yellow"></span>
+                                <span class="terminal-btn green"></span>
+                            </div>
+                            <span class="terminal-title">LLM Proxy</span>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="terminal-line">
+                                <span class="terminal-prompt">$</span>
+                                <span class="terminal-command">npm start</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output">🚀 LLM Proxy running on port 3000</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output">📊 Dashboard: http://localhost:3000</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output">🔑 Managing 3 API providers</span>
+                            </div>
+                            <div class="terminal-line">
+                                <span class="terminal-output">✨ Ready for requests!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="features-title">Key Features</h2>
+                <p class="section-subtitle" id="features-subtitle">
+                    Everything you need to manage multiple AI APIs efficiently
+                </p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title" id="feature-unified-title">Unified OpenAI Interface</h3>
+                    <p class="feature-description" id="feature-unified-desc">
+                        Fully compatible with OpenAI API, supports official client libraries
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title" id="feature-smart-title">Intelligent Provider Selection</h3>
+                    <p class="feature-description" id="feature-smart-desc">
+                        Automatically selects optimal API keys based on cost, quota, and response time
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🗺️</div>
+                    <h3 class="feature-title" id="feature-mapping-title">Transparent Model Mapping</h3>
+                    <p class="feature-description" id="feature-mapping-desc">
+                        Automatically maps OpenAI models to corresponding models from different providers
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title" id="feature-security-title">Encrypted Storage</h3>
+                    <p class="feature-description" id="feature-security-desc">
+                        Local encrypted storage of API keys for maximum security
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3 class="feature-title" id="feature-monitoring-title">Real-time Monitoring</h3>
+                    <p class="feature-description" id="feature-monitoring-desc">
+                        Track API call statistics, costs, and performance metrics
+                    </p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🖥️</div>
+                    <h3 class="feature-title" id="feature-desktop-title">Desktop Application</h3>
+                    <p class="feature-description" id="feature-desktop-desc">
+                        Cross-platform desktop app based on Tauri with excellent performance
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Providers Section -->
+    <section class="providers">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="providers-title">Supported AI Providers</h2>
+                <p class="section-subtitle" id="providers-subtitle">
+                    Connect to leading AI services through a single interface
+                </p>
+            </div>
+            
+            <div class="providers-grid">
+                <div class="provider-card">
+                    <div class="provider-icon">🤖</div>
+                    <h3 class="provider-name">OpenAI</h3>
+                    <p class="provider-models">GPT-4, GPT-4 Turbo, GPT-3.5 Turbo</p>
+                </div>
+                
+                <div class="provider-card">
+                    <div class="provider-icon">🧠</div>
+                    <h3 class="provider-name">Anthropic</h3>
+                    <p class="provider-models">Claude 3 Opus, Sonnet, Haiku</p>
+                </div>
+                
+                <div class="provider-card">
+                    <div class="provider-icon">☁️</div>
+                    <h3 class="provider-name">Azure OpenAI</h3>
+                    <p class="provider-models">GPT-4, GPT-3.5 Turbo (Enterprise)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="download" id="download">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="download-title">Get Started</h2>
+                <p class="section-subtitle" id="download-subtitle">
+                    Choose your preferred installation method
+                </p>
+            </div>
+            
+            <div class="download-options">
+                <div class="download-option featured">
+                    <div class="download-header">
+                        <div class="download-icon">🖥️</div>
+                        <h3 class="download-title" id="download-desktop-title">Desktop Application</h3>
+                        <span class="download-badge" id="download-recommended">Recommended</span>
+                    </div>
+                    <p class="download-description" id="download-desktop-desc">
+                        Cross-platform desktop app that automatically manages the backend service.
+                    </p>
+                    <div class="download-links">
+                        <a href="https://github.com/caoergou/LLMProxy/releases/latest" class="download-link" target="_blank">
+                            <span class="download-link-icon">🪟</span>
+                            <span>Windows (.msi)</span>
+                        </a>
+                        <a href="https://github.com/caoergou/LLMProxy/releases/latest" class="download-link" target="_blank">
+                            <span class="download-link-icon">🍎</span>
+                            <span>macOS (.dmg)</span>
+                        </a>
+                        <a href="https://github.com/caoergou/LLMProxy/releases/latest" class="download-link" target="_blank">
+                            <span class="download-link-icon">🐧</span>
+                            <span>Linux (.deb/.rpm)</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="download-option">
+                    <div class="download-header">
+                        <div class="download-icon">🐳</div>
+                        <h3 class="download-title" id="download-docker-title">Docker</h3>
+                    </div>
+                    <p class="download-description" id="download-docker-desc">
+                        Quick deployment with Docker and docker-compose.
+                    </p>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">📋</button>
+                        <pre><code>git clone https://github.com/caoergou/LLMProxy.git
+cd LLMProxy
+./start.sh</code></pre>
+                    </div>
+                </div>
+                
+                <div class="download-option">
+                    <div class="download-header">
+                        <div class="download-icon">⚙️</div>
+                        <h3 class="download-title" id="download-manual-title">Manual Installation</h3>
+                    </div>
+                    <p class="download-description" id="download-manual-desc">
+                        Traditional Node.js installation for development or custom setups.
+                    </p>
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">📋</button>
+                        <pre><code>npm install
+cp .env.example .env
+npm start</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Usage Examples -->
+    <section class="usage">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="usage-title">Usage Examples</h2>
+                <p class="section-subtitle" id="usage-subtitle">
+                    Get started with these simple examples
+                </p>
+            </div>
+            
+            <div class="usage-tabs">
+                <div class="tab-buttons">
+                    <button class="tab-button active" onclick="showTab('javascript')">JavaScript</button>
+                    <button class="tab-button" onclick="showTab('python')">Python</button>
+                    <button class="tab-button" onclick="showTab('curl')">cURL</button>
+                </div>
+                
+                <div class="tab-content active" id="javascript">
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">📋</button>
+                        <pre><code>import OpenAI from 'openai';
+
+const openai = new OpenAI({
+  apiKey: 'dummy-key', // LLM Proxy doesn't need real keys
+  baseURL: 'http://localhost:3000/api/v1'
+});
+
+const completion = await openai.chat.completions.create({
+  messages: [{ role: 'user', content: 'Hello, world!' }],
+  model: 'gpt-3.5-turbo',
+});</code></pre>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="python">
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">📋</button>
+                        <pre><code>import openai
+
+openai.api_key = "dummy-key"
+openai.api_base = "http://localhost:3000/api/v1"
+
+response = openai.ChatCompletion.create(
+    model="gpt-3.5-turbo",
+    messages=[{"role": "user", "content": "Hello"}]
+)</code></pre>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="curl">
+                    <div class="code-block">
+                        <button class="code-copy" onclick="copyCode(this)">📋</button>
+                        <pre><code>curl -X POST http://localhost:3000/api/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-3.5-turbo",
+    "messages": [{"role": "user", "content": "Hello"}]
+  }'</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>LLM Proxy</h4>
+                    <p id="footer-description">Unified AI API management made simple.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 id="footer-links-title">Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://github.com/caoergou/LLMProxy" target="_blank" id="footer-github">GitHub</a></li>
+                        <li><a href="https://github.com/caoergou/LLMProxy/releases" target="_blank" id="footer-releases">Releases</a></li>
+                        <li><a href="https://github.com/caoergou/LLMProxy/blob/main/docs/UNIFIED_API.md" target="_blank" id="footer-docs">Documentation</a></li>
+                        <li><a href="https://github.com/caoergou/LLMProxy/issues" target="_blank" id="footer-issues">Issues</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4 id="footer-community-title">Community</h4>
+                    <ul class="footer-links">
+                        <li><a href="https://github.com/caoergou/LLMProxy/blob/main/CONTRIBUTING.md" target="_blank" id="footer-contributing">Contributing</a></li>
+                        <li><a href="https://github.com/caoergou/LLMProxy/discussions" target="_blank" id="footer-discussions">Discussions</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p id="footer-copyright">&copy; 2024 LLM Proxy. Licensed under MIT License.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/landing.js"></script>
+</body>
+</html>
