@@ -1,0 +1,204 @@
+name: 🚀 New AI Provider Request
+description: Request to add support for a new AI service provider
+title: "[Provider Request] Add support for "
+labels: ["enhancement", "provider-request"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to request a new AI provider! Please fill out the following information to help us add support for your requested provider.
+        
+        📖 **Before submitting**: Please check if the provider is already supported by reviewing the [existing providers](https://github.com/caoergou/LLMProxy/tree/main/configs/providers).
+
+  - type: input
+    id: provider_name
+    attributes:
+      label: Provider Name
+      description: The official name of the AI service provider
+      placeholder: e.g., "Mistral AI", "Cohere", "Groq"
+    validations:
+      required: true
+
+  - type: input
+    id: provider_id
+    attributes:
+      label: Provider ID
+      description: A unique identifier for the provider (lowercase, no spaces, use hyphens)
+      placeholder: e.g., "mistral", "cohere", "groq"
+    validations:
+      required: true
+
+  - type: input
+    id: base_url
+    attributes:
+      label: API Base URL
+      description: The base URL for the provider's API
+      placeholder: e.g., "https://api.mistral.ai/v1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: auth_type
+    attributes:
+      label: Authentication Type
+      description: How does the provider authenticate API requests?
+      options:
+        - bearer (Authorization: Bearer <token>)
+        - header (Custom header)
+        - api-key (API key in URL or custom header)
+        - oauth (OAuth2)
+        - other
+    validations:
+      required: true
+
+  - type: textarea
+    id: auth_details
+    attributes:
+      label: Authentication Details
+      description: Provide specific authentication details (header names, format, etc.)
+      placeholder: e.g., "Authorization: Bearer <api_key>" or "X-API-Key: <api_key>"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: request_format
+    attributes:
+      label: Request Format
+      description: Does the provider use OpenAI-compatible request format?
+      options:
+        - openai (OpenAI compatible)
+        - custom (Custom format)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: response_format
+    attributes:
+      label: Response Format
+      description: Does the provider use OpenAI-compatible response format?
+      options:
+        - openai (OpenAI compatible)
+        - custom (Custom format)
+    validations:
+      required: true
+
+  - type: textarea
+    id: models
+    attributes:
+      label: Available Models
+      description: List the models offered by this provider (one per line)
+      placeholder: |
+        mistral-tiny
+        mistral-small
+        mistral-medium
+        mistral-large
+    validations:
+      required: true
+
+  - type: textarea
+    id: endpoints
+    attributes:
+      label: Supported Endpoints
+      description: List the API endpoints to support (one per line)
+      placeholder: |
+        /chat/completions
+        /completions
+        /embeddings
+    validations:
+      required: true
+
+  - type: input
+    id: cost_per_request
+    attributes:
+      label: Cost Per Request (USD)
+      description: Approximate cost per request in USD (for pricing comparison)
+      placeholder: e.g., "0.002"
+    validations:
+      required: false
+
+  - type: input
+    id: website
+    attributes:
+      label: Provider Website
+      description: Official website URL
+      placeholder: e.g., "https://mistral.ai"
+    validations:
+      required: true
+
+  - type: input
+    id: documentation
+    attributes:
+      label: API Documentation URL
+      description: Link to the provider's API documentation
+      placeholder: e.g., "https://docs.mistral.ai/"
+    validations:
+      required: true
+
+  - type: input
+    id: console_url
+    attributes:
+      label: Developer Console URL
+      description: Link to the provider's developer console/dashboard
+      placeholder: e.g., "https://console.mistral.ai/"
+    validations:
+      required: false
+
+  - type: textarea
+    id: registration_guide
+    attributes:
+      label: Registration Guide
+      description: Brief instructions on how to register and obtain API keys
+      placeholder: "Visit the provider's website, create an account, and navigate to the API section to generate keys..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: special_features
+    attributes:
+      label: Special Features & Capabilities
+      description: Any special features this provider offers (function calling, vision, streaming, etc.)
+      placeholder: |
+        - Function calling support
+        - Vision capabilities
+        - Streaming responses
+        - Long context (32k tokens)
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_headers
+    attributes:
+      label: Additional Headers
+      description: Any additional headers required for API requests (JSON format)
+      placeholder: |
+        {
+          "Content-Type": "application/json",
+          "User-Agent": "LLMProxy/1.0"
+        }
+    validations:
+      required: false
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes
+      description: Any other important information about this provider
+      placeholder: "Rate limits, special requirements, pricing details, etc."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: verification
+    attributes:
+      label: Verification
+      description: Please confirm the following
+      options:
+        - label: I have tested this provider's API and confirmed it works
+          required: false
+        - label: I have API access to this provider for testing
+          required: false
+        - label: I have reviewed the contribution guidelines
+          required: true
+        - label: I understand this is a request and implementation may take time
+          required: true
