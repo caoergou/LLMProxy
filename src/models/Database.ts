@@ -1,5 +1,6 @@
 import { Database as SQLiteDatabase } from 'sqlite3';
 import * as path from 'path';
+import * as fs from 'fs';
 import ProviderConfigLoader from '../utils/ProviderConfigLoader';
 
 class Database {
