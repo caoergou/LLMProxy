@@ -5,8 +5,7 @@
   "identifier": "com.caoergou.api-proxy",
   "build": {
     "frontendDist": "../public",
-    "beforeDevCommand": "npm run tauri:dev",
-    "beforeBuildCommand": "npm run build"
+    "beforeDevCommand": "npm run tauri:dev"
   },
   "app": {
     "windows": [
@@ -47,7 +46,6 @@
       "routes/**/*",
       "services/**/*",
       "utils/**/*",
-      "node_modules/**/*",
       "package.json"
     ],
     "externalBin": [],
