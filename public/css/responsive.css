@@ -1,0 +1,158 @@
+/* Responsive Design */
+
+/* Mobile First Approach */
+@media (max-width: 768px) {
+    .container {
+        padding: var(--space-md);
+    }
+    
+    .header {
+        padding: var(--space-lg);
+        text-align: center;
+    }
+    
+    .header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .header p {
+        font-size: 0.875rem;
+    }
+    
+    /* Stack navigation vertically on mobile */
+    .tabs {
+        flex-direction: column;
+        border-radius: var(--radius-lg);
+    }
+    
+    .tab {
+        border-right: none;
+        border-bottom: 1px solid var(--border-primary);
+        padding: var(--space-md);
+        text-align: center;
+    }
+    
+    .tab:last-child {
+        border-bottom: none;
+    }
+    
+    /* Adjust theme toggle and language selector for mobile */
+    .theme-toggle {
+        position: fixed;
+        top: var(--space-md);
+        right: var(--space-md);
+        z-index: 1001;
+    }
+    
+    .language-selector {
+        position: fixed;
+        top: var(--space-md);
+        right: 4rem;
+        z-index: 1001;
+        padding: var(--space-xs) var(--space-sm);
+        font-size: 0.75rem;
+    }
+    
+    /* Modal adjustments */
+    .modal-content {
+        margin: var(--space-md);
+        width: calc(100% - 2rem);
+        padding: var(--space-lg);
+    }
+    
+    /* Table responsive */
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .table {
+        min-width: 600px;
+    }
+    
+    /* Button adjustments */
+    .btn {
+        padding: var(--space-md);
+        font-size: 0.875rem;
+    }
+    
+    /* Form adjustments */
+    .form-input,
+    .form-select,
+    .form-textarea {
+        padding: var(--space-md);
+        font-size: 1rem; /* Prevent zoom on iOS */
+    }
+    
+    /* Card adjustments */
+    .card {
+        padding: var(--space-md);
+    }
+    
+    /* Dashboard grid */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    /* Content area adjustments */
+    .content {
+        margin-top: var(--space-xl);
+    }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .container {
+        max-width: 768px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Desktop */
+@media (min-width: 1025px) {
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-lg);
+    }
+    
+    .dashboard-stats {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-md);
+        margin-bottom: var(--space-lg);
+    }
+}
+
+/* Large screens */
+@media (min-width: 1280px) {
+    .container {
+        max-width: 1200px;
+    }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .theme-toggle,
+    .btn,
+    .form-input,
+    .form-select {
+        border-width: 0.5px;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    html {
+        scroll-behavior: auto;
+    }
+}
