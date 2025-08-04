@@ -166,7 +166,20 @@ curl -X POST http://localhost:3000/api/v1/chat/completions \
 ## 📚 文档
 
 - [OpenAI 统一规范接口指南](docs/UNIFIED_API.md) - 详细 API 使用说明
+- [CI/CD 工作流文档](docs/CI_CD.md) - GitHub Actions 构建和发布指南
 - [贡献指南](CONTRIBUTING.md) - 如何添加新的 AI 服务商
+
+## 🔧 开发与发布
+
+### 自动化构建
+
+项目使用 GitHub Actions 进行自动化构建和发布：
+
+- **持续集成**: 每次推送到主分支和 PR 都会触发构建测试
+- **自动发布**: 推送版本标签 (如 `v1.0.0`) 时自动构建并发布多平台安装包
+- **多平台支持**: 自动构建 Windows (.msi/.exe)、macOS (.dmg) 和 Linux (.deb/.AppImage) 版本
+
+详细配置说明请参阅 [CI/CD 工作流文档](docs/CI_CD.md)。
 
 ## 🤝 贡献
 
