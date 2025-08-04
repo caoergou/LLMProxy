@@ -4,7 +4,7 @@
 
 ## 目录结构
 
-```
+```text
 configs/providers/
 ├── openai.json      # OpenAI 配置
 ├── anthropic.json   # Anthropic 配置
@@ -19,7 +19,7 @@ configs/providers/
 ```json
 {
   "provider": "provider_id",
-  "name": "Provider Name", 
+  "name": "Provider Name",
   "display_name": "显示名称",
   "description": "简短描述",
   "base_url": "https://api.provider.com",
@@ -31,7 +31,7 @@ configs/providers/
   "models": [
     {
       "name": "model-name",
-      "display_name": "模型显示名称", 
+      "display_name": "模型显示名称",
       "description": "模型描述"
     }
   ],
