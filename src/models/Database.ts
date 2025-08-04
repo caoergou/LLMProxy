@@ -6,12 +6,20 @@ class Database {
     private db: SQLiteDatabase | null = null;
 
     init(): void {
-        const dbPath = path.join(__dirname, '../../data/api_proxy.db');
+        // Use environment variable for database path if set (for Tauri), otherwise use default
+        const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../data/api_proxy.db');
+        
+        // Ensure directory exists
+        const dbDir = path.dirname(dbPath);
+        if (!fs.existsSync(dbDir)) {
+            fs.mkdirSync(dbDir, { recursive: true });
+        }
+        
         this.db = new SQLiteDatabase(dbPath, (err) => {
             if (err) {
                 console.error('Error opening database:', err.message);
             } else {
-                console.log('Connected to SQLite database');
+                console.log('Connected to SQLite database at:', dbPath);
                 this.createTables();
             }
         });

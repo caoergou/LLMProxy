@@ -12,6 +12,7 @@
 - **📈 实时监控**: 跟踪 API 调用统计、成本和性能
 - **🖥️ Web 管理界面**: 直观的可视化管理面板
 - **⚡ 轻量部署**: 单一服务，易于部署和配置
+- **🖥️ 桌面应用**: 基于 Tauri 的跨平台桌面应用，打包体积小、性能优异
 
 ## 🎯 支持的 AI 服务商
 
@@ -23,7 +24,35 @@
 
 ## 📦 快速开始
 
-### 🐳 Docker 部署（推荐）
+### 🖥️ 桌面应用（推荐）
+
+下载适用于您系统的安装包：
+
+- **Windows**: [API Proxy v1.0.0.msi](https://github.com/caoergou/api-proxy/releases/latest)
+- **macOS**: [API Proxy v1.0.0.dmg](https://github.com/caoergou/api-proxy/releases/latest)
+- **Linux**: [API Proxy v1.0.0.deb](https://github.com/caoergou/api-proxy/releases/latest) / [API Proxy v1.0.0.rpm](https://github.com/caoergou/api-proxy/releases/latest)
+
+安装后直接启动即可，应用会自动管理后端服务。
+
+#### 🛠 从源码构建桌面应用
+
+```bash
+# 克隆项目
+git clone https://github.com/caoergou/api-proxy.git
+cd api-proxy
+
+# 安装依赖
+npm install
+
+# 构建桌面应用
+npm run tauri:build
+
+# 安装包位置：src-tauri/target/release/bundle/
+```
+
+详细构建指南请参考：[Tauri 桌面应用构建指南](docs/TAURI_BUILD_GUIDE.md)
+
+### 🐳 Docker 部署
 
 ```bash
 # 克隆项目

@@ -1,11 +1,13 @@
-import {
-  ExtendedModelInfo,
+
+import ProviderConfigLoader from '../utils/ProviderConfigLoader';
+import { 
+  ModelFamilyInfo, 
+  ModelProviderInfo, 
+  ExtendedModelInfo, 
+  ProviderConfig, 
   ModelCapabilities,
-  ModelFamilyInfo,
-  ModelFamilyWithAvgPrice,
-  ModelProviderInfo,
-} from "../types";
-import ProviderConfigLoader from "../utils/ProviderConfigLoader";
+  ModelFamilyWithAvgPrice
+} from '../types';
 
 class ModelAggregationService {
   private modelFamilies: Map<string, ModelFamilyInfo> = new Map();

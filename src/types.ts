@@ -204,4 +204,5 @@ export interface ModelFamilyDetailResponse {
 
 export interface ModelFamilyWithAvgPrice extends ModelFamilyInfo {
   avgPrice: number;
+
 }
