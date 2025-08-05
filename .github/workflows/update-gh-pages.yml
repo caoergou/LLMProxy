@@ -1,0 +1,75 @@
+name: Update GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+    paths: 
+      - 'index.html'
+      - 'assets/**'
+      - 'docs/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-gh-pages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+      - name: Create/update gh-pages branch
+        run: |
+          # Check if gh-pages branch exists
+          if git rev-parse --verify origin/gh-pages >/dev/null 2>&1; then
+            echo "Updating existing gh-pages branch"
+            git checkout gh-pages
+            git reset --hard origin/gh-pages
+          else
+            echo "Creating new gh-pages branch"
+            git checkout --orphan gh-pages
+            git rm -rf .
+          fi
+          
+      - name: Copy static website files
+        run: |
+          # Checkout the files we need from main branch
+          git checkout main -- index.html assets/ docs/
+          
+          # Create README for gh-pages branch
+          cat > README.md << 'EOF'
+          # LLM Proxy - GitHub Pages
+
+          This branch contains the static website files for the LLM Proxy project.
+
+          The website is automatically deployed to GitHub Pages from this branch.
+
+          ## Files Structure
+          - `index.html` - Main landing page
+          - `assets/` - CSS and JavaScript files for the landing page  
+          - `docs/` - Documentation files
+
+          For the main project code, please see the `main` branch.
+          EOF
+          
+      - name: Commit and push changes
+        run: |
+          git add .
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update GitHub Pages from main branch
+
+            - Sync static website files from main branch
+            - Updated: $(date)"
+            git push origin gh-pages
+          fi
