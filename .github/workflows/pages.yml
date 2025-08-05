@@ -1,8 +1,10 @@
 name: Deploy GitHub Pages
 
+
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [ gh-publish ]
   workflow_dispatch:
 
 permissions:
